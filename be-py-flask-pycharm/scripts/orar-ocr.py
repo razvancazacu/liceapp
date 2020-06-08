@@ -1,10 +1,8 @@
 import cv2
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import csv
 import pytesseract
 import os
+import time
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -42,9 +40,7 @@ def get_cropped_classes_img(img):
 
 def get_binnary_img(img):
     thresh, img_bin = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY)
-    # inverting the image
     img_bin = 255 - img_bin
-    #     cv2.imwrite('../poze-orar/out_0_inverted.png',img_bin)
     return img_bin
 
 
@@ -72,7 +68,6 @@ def get_vh_lines_img(img):
 
     img_vh = cv2.erode(~img_vh, kernel, iterations=2)
     thresh, img_vh = cv2.threshold(img_vh, 128, 255, cv2.THRESH_BINARY)
-    #     print_img(img_vh)
 
     cv2.imwrite("../poze-orar/out_0_img_vh.jpg", img_vh)
     bitxor = cv2.bitwise_xor(img, img_vh)
@@ -85,7 +80,6 @@ def get_table_cells(img, data_type):
     img_vh, bitnot = get_vh_lines_img(img)
     contours, hierarchy = cv2.findContours(img_vh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     box = []
-    #     hours/ days/ classes
     i = 0
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
@@ -106,27 +100,21 @@ def get_table_cells(img, data_type):
         return box[::-1]
 
 
-def load_images_from_folder(folder):
-    images = []
-    i = 0
-    for filename in os.listdir(folder):
-        i += 1
+def load_images_from_folder(path):
+    img_color = cv2.imread(path)
+    page_title = get_page_title(img_color)
+    img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
+    img_days = get_cropped_days_img(img)
+    boxes_days = get_table_cells(img_days, 'days')
 
-        #         img = cv2.imread(os.path.join(folder,filename),0)
-        img_color = cv2.imread(
-            'C:\\Users\\cmrra\\Documents\\Licenta-Project\\liceapp\\be-py-flask-pycharm\\tmp\\300dpi\\out_50.jpg')
-        img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
-        img_days = get_cropped_days_img(img)
-        boxes_days = get_table_cells(img_days, 'days')
+    img_hours = get_cropped_hours_img(img)
+    boxes_hours = get_table_cells(img_hours, 'hours')
 
-        img_hours = get_cropped_hours_img(img)
-        boxes_hours = get_table_cells(img_hours, 'hours')
+    img_classes = get_cropped_classes_img(img)
+    img_classes_col = get_cropped_classes_img(img_color)
+    boxes_classes, bitnot_classes = get_table_cells(img_classes, 'classes')
 
-        img_classes = get_cropped_classes_img(img)
-        img_classes_col = get_cropped_classes_img(img_color)
-        boxes_classes, bitnot_classes = get_table_cells(img_classes, 'classes')
-        if i == 1:
-            return boxes_days, boxes_hours, boxes_classes, bitnot_classes, img_classes_col
+    return page_title, boxes_days, boxes_hours, boxes_classes, bitnot_classes, img_classes_col
 
 
 def Sort(sub_li):
@@ -159,22 +147,6 @@ def print_page_data(days, hours, classes):
         if cl[0] == 0:
             print('new Day')
         print(index, cl)
-
-
-day_string = ["Luni", "Marti", "Miercuri", "Joi", "Vineri"]
-hour_string = ["8:00",
-               "9:00",
-               "10:00",
-               "11:00",
-               "12:00",
-               "13:00",
-               "14:00",
-               "15:00",
-               "16:00",
-               "17:00",
-               "18:00",
-               "19:00",
-               "20:00"]
 
 
 def get_cell_string(cell_img, psm='psm-3'):
@@ -217,31 +189,18 @@ class Ora:
         print(self.date)
 
 
-days, hours, classes, img_classes_bit, img_classes_col = load_images_from_folder(
-    os.path.dirname(os.path.abspath('../tmp/300dpi/s')))
-hours_starting_x = [hour[0] for hour in hours]
-
-inner = ''
-outer = []
-classes_by_days = []
-optimi = []
-ore = []
-
-
-def get_small_cell_values(cell_img, grupa, filtered):
-    print_img(cell_img)
+def get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings):
+    cell_img = img_classes_col[y:y + h, x:x + int((2 * w) / 3)]
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
     left_part = filtered_part
     cell_img = img_classes_col[y:y + h, x + int((2.1 * w) / 3):x + w]
-    # print_img(cell_img)
     right_part = get_cell_string(cell_img)
     if len(right_part) == 0:
         right_part = get_cell_string(cell_img, psm="psm-10")
     right_part = right_part.splitlines()
     filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
-    # print(filtered_numbers)
     right_part = filtered_part
     idx_gr = left_part[1].find('Gr')
     idx_gr_2 = left_part[1].find('G r')
@@ -256,136 +215,212 @@ def get_small_cell_values(cell_img, grupa, filtered):
     filtered = left_part + right_part
 
 
-for indx, cl in enumerate(classes):
-    x, y, w, h = cl
-    if x not in hours_starting_x:  # skipping wrong taken cells
-        continue
-    cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
+def extract_classes_data(page_path):
+    print(page_path)
+    ore = []
+    page_title, days, hours, classes, img_classes_bit, img_classes_col = load_images_from_folder(page_path)
+    hours_starting_x = [hour[0] for hour in hours]
 
-    if np.mean(cell_img) <= 250:  # skipping white cells
-        grupa = 'none'
-        materie = ''
-        sala = ''
-        profesor = ''
-        data = ''
-        warnings = []
-        filtered = []
-        # print("Cell values", x, y, w, h)
-        if h < 65:  # for 1/8 cells and 1/6
-            cell_img = img_classes_col[y:y + h, x:x + int((2 * w) / 3)]
-            get_small_cell_values(cell_img, grupa, filtered)
-        else:
-            out = get_cell_string(cell_img)
-            words = out.splitlines()
-            filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
+    warnings = []
+    for indx, cl in enumerate(classes):
+        x, y, w, h = cl
+        if x not in hours_starting_x:  # skipping wrong taken cells
+            continue
+        cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
+        # print_img(cell_img)
+        if np.mean(cell_img) <= 250:  # skipping white cells
+            # print_img(cell_img)
 
-        print("---------------------------------")
-        print("filtered", indx, "= ", filtered)
-
-        if len(filtered):
-
-            # calculate day
-            current_day = int(y / (days[-1][1] - days[-2][1]))
-
-            # Calculating if hour its weekly or once a odd/even week
-            _, day_cell_y, _, day_cell_h = days[current_day]
-            eps = 5
-            if (y + eps) >= day_cell_y + int(day_cell_h / 2):
-                saptamana = "Par"
-            elif ((day_cell_h / 3) - 2 * eps) < h < ((day_cell_h / 3) + eps):  # treime ( 3 grupe saptamanal)
-                saptamana = "Impar / Par"
+            grupa = 'none'
+            materie = ''
+            sala = ''
+            filtered = []
+            if h < 65:  # for 1/8 cells and 1/6
+                get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings)
             else:
-                saptamana = "Impar"
+                out = get_cell_string(cell_img)
+                words = out.splitlines()
+                filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
+            if len(filtered):
 
-            # Extracting the hour of the class
-            current_hour_idx = 0
-            for index, hour in enumerate(hours):
-                if hour[0] == x:
-                    current_hour_idx = index
-                    break
-            # Case when cell has on the same row the teacher name and the group
-            gr_idx = filtered[0].find('Gr')
-            if gr_idx != -1:
-                grupa = filtered[0][gr_idx:]
-                profesor = filtered[0][:gr_idx]
-            else:
-                profesor = filtered[0]
-            # Rare case of missreading 'Gr' as 'G r'
-            if len(filtered) == 4:
-                filtered[1] += filtered[2]  # posibila inlocuire : read until no number meet Gr__4
-                filtered.pop(2)
+                # calculate day
+                current_day = int(y / (days[-1][1] - days[-2][1]))
 
-            elif len(filtered) == 2:
-                profesor = filtered[0]
-                words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
-                # classroom and class are read
-                if len(words) > 1:
-                    sala = words[-1]
-                    materie = ''.join(words[:-1])
-                # classroom is not detected ( it is a single digit, so it needs psm-10 )
-                elif len(words) == 1:
-                    cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
-                    print_img(cell_img)
-                    sala = get_cell_string(cell_img, "psm-10")
-                    materie = words[0]
+                # Calculating if hour its weekly or once a odd/even week
+                _, day_cell_y, _, day_cell_h = days[current_day]
+                eps = 5
+                if (y + eps) >= day_cell_y + int(day_cell_h / 2):
+                    saptamana = "Par"
+                elif ((day_cell_h / 3) - 2 * eps) < h < ((day_cell_h / 3) + eps):  # treime ( 3 grupe saptamanal)
+                    saptamana = "Impar / Par"
                 else:
-                    warnings.append("No readed data")
-            else:
-                materie = filtered[1]
-                partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
-                if len(partitioning) == 3:
-                    grupa = partitioning[0] + partitioning[1]
-                    sala = partitioning[2]
-                elif len(partitioning) == 2:
-                    grupa = partitioning[0]
-                    sala = partitioning[1]
+                    saptamana = "Impar"
+
+                # Extracting the hour of the class
+                current_hour_idx = 0
+                for index, hour in enumerate(hours):
+                    if hour[0] == x:
+                        current_hour_idx = index
+                        break
+
+                if len(filtered) == 1:
+                    warnings.append(
+                        "Cell" + str(indx) + "First run received only one data. Retrying with greyscale image and "
+                                             "isolating parts")
+                    cell_img = img_classes_bit[y:y + h, x:x + w]
+                    out = get_cell_string(cell_img)
+                    words = out.splitlines()
+                    cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+                    out = get_cell_string(cell_img, psm="psm-10")
+                    words += out.splitlines()
+                    filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
+
+                if len(filtered) <= 1:
+                    warnings.append("Cell" + str(indx) + "Unsuccessful retry. ")
+                    ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
+                                   hour_string[current_hour_idx + round((w / 260))], 'none', 'none', 'none', 'none',
+                                   'none', 'none',
+                                   filtered))
+                    continue
+
+                # Case when cell has on the same row the teacher name and the group
+                gr_idx = filtered[0].find('Gr')
+                if gr_idx != -1:
+                    grupa = filtered[0][gr_idx:]
+                    profesor = filtered[0][:gr_idx]
                 else:
-                    sala = partitioning[0]
+                    profesor = filtered[0]
 
-            grupa = grupa.replace(" ", "").replace("_", "")
-            profesor = profesor.replace('|', 'I')
-            materie = materie.replace('|', 'l')
-            ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
-                           hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
-                           warnings, grupa,
-                           filtered))
+                # Rare case of missreading 'Gr' as 'G r'
+                if len(filtered) == 4:
+                    filtered[1] += filtered[2]  # posibila inlocuire : read until no number meet Gr__4
+                    filtered.pop(2)
 
-for o in ore:
-    print(o)
-print("ore len: ", len(ore))
-print_page_data(days, hours, classes)
-# optime < 50 h
-# patrime >65 <100
-# sesime >55 <65
-# jumatati aprox 190
-# luni-vineri heigh = aprox(380)
+                if len(filtered) == 2:
+                    gr_in_first = filtered[0].find('Gr')
+                    gr_in_first_2 = filtered[0].find('G r')
+                    if gr_in_first != -1:
+                        grupa = filtered[0][gr_in_first:]
+                        filtered[0] = filtered[0].replace(grupa, '')
+                    elif gr_in_first_2 != -1:
+                        grupa = filtered[0][gr_in_first_2:]
+                        filtered[0] = filtered[0].replace(grupa, '')
+                    profesor = filtered[0]
+                    words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
 
-# img = cv2.imread(
-#     'C:\\Users\\cmrra\\Documents\\Licenta-Project\\liceapp\\be-py-flask-pycharm\\tmp\\300dpi\\out_50.jpg')
-# img_classes = get_cropped_classes_img(img)
-# print_img(img_classes)
-#
-# for i in range(0, len(classes)):
-#     x, y, w, h = classes[i]
-#     #     print(x,y,w,h)
-#     #     cell_img = img_classes[int(y+(h*0.7)):y+h, x:x+w]
-#     cell_img = img_classes[y:y + h, x:x + w]
-#     if np.mean(cell_img) <= 250:
-#         print_img(cell_img)
-#         if h < 50:  # optime
-#             print('sfert-----------------')
-#             cell_img = img_classes[y:y + h, x:x + int((2 * w) / 3)]
-#             print_img(cell_img)
-#             print(get_cell_string(cell_img))
-#             cell_img = img_classes[y:y + h, x + int((2.3 * w) / 3):x + w]
-#             print_img(cell_img)
-#             print(get_cell_string(cell_img))
-#         out = get_cell_string(cell_img)
-#         if len(out) > 5:
-#             print('---------------')
-#             print(out)
+                    # classroom and class are read
+                    if len(words) > 1:
+                        sala = words[-1]
+                        materie = ''.join(words[:-1])
+                    # classroom is not detected ( it is a single digit, so it needs psm-10 )
+                    elif len(words) == 1:
+                        cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+                        sala = get_cell_string(cell_img, "psm-10")
+                        materie = words[0]
+                    else:
+                        warnings.append("No received data")
+                elif len(filtered) == 3:
 
-#     if(len(out)==0):
-#         out = pytesseract.image_to_string(cell_img, config='--psm 3')
-#         print("len=0:", out)
-#     else:
+                    materie = filtered[1]
+                    partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
+                    # print(partitioning)
+
+                    if len(partitioning) == 3:
+                        grupa = partitioning[0] + partitioning[1]
+                        sala = partitioning[2]
+                    elif len(partitioning) == 2:
+                        grupa = partitioning[0]
+                        sala = partitioning[1]
+                    else:
+                        sala = partitioning[0]
+                if sala == '':
+                    cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+                    sala = get_cell_string(cell_img, psm="psm-10")
+                if sala.find("Har") != -1:
+                    sala = "Amf. Hater (Et. 0)"
+                elif sala.find("Sto") != -1:
+                    sala = "Amf. Stoilow (Et. 1)"
+                elif sala.find("Pom") != -1:
+                    sala = "Amf. Pompeiu (Et. 2)"
+                elif sala.find("Tit") != -1:
+                    sala = "Amf. Titeica (Et. 3)"
+                elif sala.find("Chim") != -1:
+                    sala = "Amf. R1 (Et. 1, Fac. Chimie)"
+                    grupa = "none"
+                else:
+                    sala = "Sala " + sala
+
+                grupa = grupa.replace(" ", "").replace("_", "").replace(")", "")
+                profesor = profesor.replace('|', 'I')
+                materie = materie.replace('|', 'l')
+                ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
+                               hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
+                               warnings, grupa,
+                               filtered))
+    return Pagina(page_title, ore)
+
+
+class Pagina:
+    def __init__(self, titlu, ore):
+        self.titlu = titlu
+        self.ore = ore
+
+
+day_string = ["Luni", "Marti", "Miercuri", "Joi", "Vineri"]
+hour_string = ["8:00",
+               "9:00",
+               "10:00",
+               "11:00",
+               "12:00",
+               "13:00",
+               "14:00",
+               "15:00",
+               "16:00",
+               "17:00",
+               "18:00",
+               "19:00",
+               "20:00"]
+
+from joblib import Parallel, delayed
+import multiprocessing
+
+num_cores = multiprocessing.cpu_count()
+if __name__ == '__main__':
+    start = time.time()
+    # with open('page.txt', 'w') as outfile:
+    #     folder = os.path.dirname(os.path.abspath('../tmp/300dpi/pages'))
+    #     for filename in os.listdir(folder):
+    #         path = os.path.join(folder, filename)
+    #         outfile.write(str(filename) + '---------------------------------' + '\n')
+    #         ore = extract_classes_data(path)
+    #         for o in ore:
+    #             outfile.write(str(o) + '\n')
+    with open('page.txt', 'w') as outfile:
+        folder = os.path.dirname(os.path.abspath('../tmp/300dpi/pages'))
+        paths = []
+        for filename in os.listdir(folder):
+            paths.append(os.path.join(folder, filename))
+        # print(paths)
+        pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
+            delayed(extract_classes_data)(path) for path in paths[:10])
+        print(pagini)
+        print('--------------------')
+        for pag in pagini:
+            outfile.write(str(pag.titlu) + '\n')
+            for ora in pag.ore:
+                outfile.write(str(ora) + '\n')
+
+    print(time.time() - start)
+
+# # Testing
+# ore = extract_classes_data(
+#     'C:\\Users\\cmrra\\Documents\\Licenta-Project\\liceapp\\be-py-flask-pycharm\\tmp\\300dpi\\out_52.jpg')
+# for o in ore:
+#     print(o)
+
+# print_page_data(days, hours, classes)
+# # optime < 50 h
+# # patrime >65 <100
+# # sesime >55 <65..
+# # jumatati aprox 190
+# # luni-vineri heigh = aprox(380).
