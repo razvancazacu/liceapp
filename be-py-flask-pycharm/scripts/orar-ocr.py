@@ -336,6 +336,7 @@ def extract_classes_data(page_path):
                 if sala == '':
                     cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
                     sala = get_cell_string(cell_img, psm="psm-10")
+
                 if sala.find("Har") != -1:
                     sala = "Amf. Hater (Et. 0)"
                 elif sala.find("Sto") != -1:
@@ -347,12 +348,17 @@ def extract_classes_data(page_path):
                 elif sala.find("Chim") != -1:
                     sala = "Amf. R1 (Et. 1, Fac. Chimie)"
                     grupa = "none"
+                elif sala == 'O':
+                    sala = "Sala " + '0'
                 else:
                     sala = "Sala " + sala
 
                 grupa = grupa.replace(" ", "").replace("_", "").replace(")", "")
                 profesor = profesor.replace('|', 'I')
                 materie = materie.replace('|', 'l')
+                grupa = ''.join([i if ord(i) < 128 else '' for i in grupa])
+                materie = ''.join([i if ord(i) < 128 else '' for i in materie])
+                profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
                 ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                                hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                                warnings, grupa,
