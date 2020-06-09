@@ -4,6 +4,7 @@ import pytesseract
 import os
 import time
 import json
+from scripts.utils import *
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -118,38 +119,6 @@ def load_images_from_folder(path):
     else:
         raise NameError("No image found at path: ", path)
     return page_title, boxes_days, boxes_hours, boxes_classes, bitnot_classes, img_classes_col
-
-
-def Sort(sub_li):
-    return sorted(sub_li, key=lambda x: x[0])
-
-
-def print_page_data(days, hours, classes):
-    print('---------------------------------Rows')
-    print('Luni:      ', days[0])
-    print('Marti:     ', days[1])
-    print('Miercuri:  ', days[2])
-    print('Joi:       ', days[3])
-    print('Vineri:    ', days[4])
-    print('------------------------------Columns')
-    print('8:  ', hours[0])
-    print('9:  ', hours[1])
-    print('10: ', hours[2])
-    print('11: ', hours[3])
-    print('12: ', hours[4])
-    print('13: ', hours[5])
-    print('14: ', hours[6])
-    print('15: ', hours[7])
-    print('16: ', hours[8])
-    print('17: ', hours[9])
-    print('18: ', hours[10])
-    print('19: ', hours[11])
-    print('------------------------------Cells')
-
-    for index, cl in enumerate(classes):
-        if cl[0] == 0:
-            print('new Day')
-        print(index, cl)
 
 
 def get_cell_string(cell_img, psm='psm-3'):
@@ -395,21 +364,6 @@ class Pagina:
         return json.dumps(self, default=lambda o: o.__dict__,
                           indent=4)
 
-
-day_string = ["Luni", "Marti", "Miercuri", "Joi", "Vineri"]
-hour_string = ["8:00",
-               "9:00",
-               "10:00",
-               "11:00",
-               "12:00",
-               "13:00",
-               "14:00",
-               "15:00",
-               "16:00",
-               "17:00",
-               "18:00",
-               "19:00",
-               "20:00"]
 
 from joblib import Parallel, delayed
 import multiprocessing
