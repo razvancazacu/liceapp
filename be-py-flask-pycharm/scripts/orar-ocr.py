@@ -3,7 +3,6 @@ import numpy as np
 import pytesseract
 import os
 import time
-
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
@@ -325,14 +324,15 @@ def extract_classes_data(page_path):
                     partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
                     # print(partitioning)
 
-                    if len(partitioning) == 3:
+                    if (len(partitioning) == 3) and partitioning[0].find('G') != -1:
                         grupa = partitioning[0] + partitioning[1]
                         sala = partitioning[2]
-                    elif len(partitioning) == 2:
+                    elif len(partitioning) == 2 and partitioning[0].find('G') != -1 :
                         grupa = partitioning[0]
                         sala = partitioning[1]
                     else:
-                        sala = partitioning[0]
+                        # sala = partitioning[0]
+                        sala = ''.join(partitioning)
                 if sala == '':
                     cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
                     sala = get_cell_string(cell_img, psm="psm-10")
@@ -350,7 +350,7 @@ def extract_classes_data(page_path):
                     grupa = "none"
                 elif sala == 'O':
                     sala = "Sala " + '0'
-                else:
+                elif sala.find('Fizica') == -1:
                     sala = "Sala " + sala
 
                 grupa = grupa.replace(" ", "").replace("_", "").replace(")", "")
