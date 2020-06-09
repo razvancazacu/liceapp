@@ -1,0 +1,167 @@
+{
+    "titlu": "Facultative an II (Mate, Mate-Info, Mate Apl., Info, CTI)",
+    "warnings": [],
+    "ore": [
+        {
+            "zi": "Marti",
+            "ora_inceput": "16:00",
+            "ora_final": "18:00",
+            "profesor": "Mincu G",
+            "materie": "DidacticaSpec",
+            "sala": "Sala 220",
+            "grupa": "Serii:20 21 ",
+            "saptamana": "Impar",
+            "date": [
+                "Mincu G",
+                "DidacticaSpec",
+                "[SE] s20+21 220"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "14:00",
+            "ora_final": "16:00",
+            "profesor": "Tataram M",
+            "materie": "Didacticalnfo",
+            "sala": "Sala 220",
+            "grupa": "Serii:23 24 ",
+            "saptamana": "Impar",
+            "date": [
+                "Tataram M",
+                "Didacticalnfo",
+                "[SE] s23, 24 220"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Tataram M",
+            "materie": "Didacticalnfo",
+            "sala": "Sala 220",
+            "grupa": "Serii:25 ",
+            "saptamana": "Impar",
+            "date": [
+                "Tataram M",
+                "Didacticalnfo",
+                "[SE] s25 220"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "16:00",
+            "ora_final": "18:00",
+            "profesor": "Tataram M",
+            "materie": "Didacticalnfo",
+            "sala": "Sala 220",
+            "grupa": "Serii:23 24 25 ",
+            "saptamana": "Par",
+            "date": [
+                "Tataram M",
+                "Didacticalnfo",
+                "[CU] s23, 24, 25 220"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Dumitriu A",
+            "materie": "Intro loT",
+            "sala": "Amf. Titeica (Et. 3)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Dumitriu A",
+                "Intro loT",
+                "3(Titeica)"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "Voica C",
+            "materie": "DidacticaSpec",
+            "sala": "Sala 219",
+            "grupa": "Serii:22 ",
+            "saptamana": "Par",
+            "date": [
+                "Voica C",
+                "DidacticaSpec",
+                "[SE] s22 219"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "lonita D",
+            "materie": "Engleza",
+            "sala": "Sala 9",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "lonita D",
+                "Engleza"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "10:00",
+            "ora_final": "12:00",
+            "profesor": "lonita D",
+            "materie": "Engleza",
+            "sala": "Sala 0",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "lonita D",
+                "Engleza"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "12:00",
+            "ora_final": "14:00",
+            "profesor": "lonita D",
+            "materie": "Engleza",
+            "sala": "Sala 0",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "lonita D",
+                "Engleza"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "14:00",
+            "ora_final": "16:00",
+            "profesor": "lonita D",
+            "materie": "Engleza",
+            "sala": "Sala 2",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "lonita D",
+                "Engleza"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "Voica C",
+            "materie": "DidacticaSpec",
+            "sala": "Amf. Hater (Et. 0)",
+            "grupa": "Serii:20 21 22 ",
+            "saptamana": "Par",
+            "date": [
+                "Voica C",
+                "DidacticaSpec",
+                "[CU] s20+21+22 O(Haret)"
+            ]
+        }
+    ]
+}

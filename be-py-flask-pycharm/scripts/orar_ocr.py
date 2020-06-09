@@ -3,6 +3,8 @@ import numpy as np
 import pytesseract
 import os
 import time
+import json
+
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
@@ -101,18 +103,20 @@ def get_table_cells(img, data_type):
 
 def load_images_from_folder(path):
     img_color = cv2.imread(path)
-    page_title = get_page_title(img_color)
-    img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
-    img_days = get_cropped_days_img(img)
-    boxes_days = get_table_cells(img_days, 'days')
+    if img_color is not None:
+        page_title = get_page_title(img_color)
+        img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
+        img_days = get_cropped_days_img(img)
+        boxes_days = get_table_cells(img_days, 'days')
 
-    img_hours = get_cropped_hours_img(img)
-    boxes_hours = get_table_cells(img_hours, 'hours')
+        img_hours = get_cropped_hours_img(img)
+        boxes_hours = get_table_cells(img_hours, 'hours')
 
-    img_classes = get_cropped_classes_img(img)
-    img_classes_col = get_cropped_classes_img(img_color)
-    boxes_classes, bitnot_classes = get_table_cells(img_classes, 'classes')
-
+        img_classes = get_cropped_classes_img(img)
+        img_classes_col = get_cropped_classes_img(img_color)
+        boxes_classes, bitnot_classes = get_table_cells(img_classes, 'classes')
+    else:
+        raise NameError("No image found at path: ", path)
     return page_title, boxes_days, boxes_hours, boxes_classes, bitnot_classes, img_classes_col
 
 
@@ -163,20 +167,19 @@ def get_cell_string(cell_img, psm='psm-3'):
 
 
 class Ora:
-    def __init__(self, zi, ora_inceput, ora_final, profesor, materie, sala, saptamana, warnings, grupa='', date=''):
+    def __init__(self, zi, ora_inceput, ora_final, profesor, materie, sala, saptamana, grupa='', date=''):
         self.zi = zi
         self.ora_inceput = ora_inceput
         self.ora_final = ora_final
-        self.date = date
         self.profesor = profesor
         self.materie = materie
         self.sala = sala
         self.grupa = grupa
-        self.warnings = warnings
         if len(grupa) == 0 or grupa == 'none':
             self.saptamana = "Impar / Par"
         else:
             self.saptamana = saptamana
+        self.date = date
 
     def __str__(self):
         return "\nZi: " + str(self.zi) + "\nOra de incepere: " + str(self.ora_inceput) + "\nOra de final: " + str(
@@ -210,25 +213,21 @@ def get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings
         grupa = left_part[1][idx_gr_2:]
         left_part[1] = left_part[1][:idx_gr_2]
     if grupa == 'none':
-        warnings.append("Possible group required for this cell")
+        warnings.append("Possible group required")
     filtered = left_part + right_part
 
 
 def extract_classes_data(page_path):
-    print(page_path)
     ore = []
     page_title, days, hours, classes, img_classes_bit, img_classes_col = load_images_from_folder(page_path)
     hours_starting_x = [hour[0] for hour in hours]
-
     warnings = []
     for indx, cl in enumerate(classes):
         x, y, w, h = cl
         if x not in hours_starting_x:  # skipping wrong taken cells
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
-        # print_img(cell_img)
         if np.mean(cell_img) <= 250:  # skipping white cells
-            # print_img(cell_img)
 
             grupa = 'none'
             materie = ''
@@ -322,17 +321,22 @@ def extract_classes_data(page_path):
 
                     materie = filtered[1]
                     partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
-                    # print(partitioning)
 
-                    if (len(partitioning) == 3) and partitioning[0].find('G') != -1:
-                        grupa = partitioning[0] + partitioning[1]
-                        sala = partitioning[2]
-                    elif len(partitioning) == 2 and partitioning[0].find('G') != -1 :
+                    if len(partitioning) >= 3:
+                        if partitioning[0].find('G') != -1 or partitioning[0].find('SE'):
+                            grupa = ''.join(partitioning[:-1])
+                            sala = partitioning[-1]
+
+                    elif len(partitioning) == 2 and partitioning[0].find('G') != -1:
                         grupa = partitioning[0]
                         sala = partitioning[1]
                     else:
-                        # sala = partitioning[0]
-                        sala = ''.join(partitioning)
+                        if partitioning[0].find('Gr') != -1 or partitioning[0].find('G r') != -1:
+                            grupa = ''.join(partitioning)
+                            sala = 'none'
+                            warnings.append("No classroom found")
+                        else:
+                            sala = ''.join(partitioning)
                 if sala == '':
                     cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
                     sala = get_cell_string(cell_img, psm="psm-10")
@@ -353,7 +357,22 @@ def extract_classes_data(page_path):
                 elif sala.find('Fizica') == -1:
                     sala = "Sala " + sala
 
-                grupa = grupa.replace(" ", "").replace("_", "").replace(")", "")
+                import re
+                temp = re.findall(r'\d+', grupa)
+                res = list(map(int, temp))
+                if len(res):
+                    if res[0] < 10:
+                        grupa_processed = 'Grupa:'
+                    else:
+                        grupa_processed = 'Serii:'
+                    for number in res:
+                        if number < 10:
+                            grupa_processed += str(number)
+                        else:
+                            grupa_processed += str(number) + ' '
+                else:
+                    grupa_processed = 'none'
+                grupa = grupa_processed
                 profesor = profesor.replace('|', 'I')
                 materie = materie.replace('|', 'l')
                 grupa = ''.join([i if ord(i) < 128 else '' for i in grupa])
@@ -361,15 +380,20 @@ def extract_classes_data(page_path):
                 profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
                 ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                                hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
-                               warnings, grupa,
+                               grupa,
                                filtered))
-    return Pagina(page_title, ore)
+    return Pagina(page_title, warnings, ore)
 
 
 class Pagina:
-    def __init__(self, titlu, ore):
+    def __init__(self, titlu, warnings, ore):
         self.titlu = titlu
+        self.warnings = warnings
         self.ore = ore
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          indent=4)
 
 
 day_string = ["Luni", "Marti", "Miercuri", "Joi", "Vineri"]
@@ -391,38 +415,23 @@ from joblib import Parallel, delayed
 import multiprocessing
 
 num_cores = multiprocessing.cpu_count()
+
 if __name__ == '__main__':
     start = time.time()
-    # with open('page.txt', 'w') as outfile:
-    #     folder = os.path.dirname(os.path.abspath('../tmp/300dpi/pages'))
-    #     for filename in os.listdir(folder):
-    #         path = os.path.join(folder, filename)
-    #         outfile.write(str(filename) + '---------------------------------' + '\n')
-    #         ore = extract_classes_data(path)
-    #         for o in ore:
-    #             outfile.write(str(o) + '\n')
+
     with open('page.txt', 'w') as outfile:
         folder = os.path.dirname(os.path.abspath('../tmp/300dpi/pages'))
         paths = []
         for filename in os.listdir(folder):
             paths.append(os.path.join(folder, filename))
-        # print(paths)
         pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
             delayed(extract_classes_data)(path) for path in paths[:10])
-        print(pagini)
-        print('--------------------')
         for pag in pagini:
             outfile.write(str(pag.titlu) + '\n')
             for ora in pag.ore:
                 outfile.write(str(ora) + '\n')
 
     print(time.time() - start)
-
-# # Testing
-# ore = extract_classes_data(
-#     'C:\\Users\\cmrra\\Documents\\Licenta-Project\\liceapp\\be-py-flask-pycharm\\tmp\\300dpi\\out_52.jpg')
-# for o in ore:
-#     print(o)
 
 # print_page_data(days, hours, classes)
 # # optime < 50 h

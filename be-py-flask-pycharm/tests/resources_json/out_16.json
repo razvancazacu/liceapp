@@ -1,0 +1,242 @@
+{
+    "titlu": "CTl Grupa 151",
+    "warnings": [],
+    "ore": [
+        {
+            "zi": "Luni",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "Stancu A",
+            "materie": "UtilizareaSO",
+            "sala": "Sala L.310",
+            "grupa": "Grupa:1",
+            "saptamana": "Impar",
+            "date": [
+                "Stancu A",
+                "UtilizareaSO",
+                "Gr 1 L.310"
+            ]
+        },
+        {
+            "zi": "Luni",
+            "ora_inceput": "12:00",
+            "ora_final": "15:00",
+            "profesor": "Mihail A",
+            "materie": "MatematiciSpeciale",
+            "sala": "Amf. Hater (Et. 0)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Mihail A",
+                "MatematiciSpeciale",
+                "O(Haret)"
+            ]
+        },
+        {
+            "zi": "Luni",
+            "ora_inceput": "15:00",
+            "ora_final": "17:00",
+            "profesor": "llias P",
+            "materie": "MatematiciSpeciale",
+            "sala": "Sala 0",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "llias P",
+                "MatematiciSpeciale"
+            ]
+        },
+        {
+            "zi": "Luni",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Toca L",
+            "materie": "TehniciDeProgr",
+            "sala": "Sala 8",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Toca L",
+                "TehniciDeProgr"
+            ]
+        },
+        {
+            "zi": "Marti",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "lrofti P",
+            "materie": "UtilizareaSO",
+            "sala": "Amf. Hater (Et. 0)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "lrofti P",
+                "UtilizareaSO",
+                "0(Haret)"
+            ]
+        },
+        {
+            "zi": "Marti",
+            "ora_inceput": "10:00",
+            "ora_final": "12:00",
+            "profesor": "Pascan R",
+            "materie": "CalculNumeric",
+            "sala": "Amf. Hater (Et. 0)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Pascan R",
+                "CalculNumeric",
+                "O(Haret)"
+            ]
+        },
+        {
+            "zi": "Marti",
+            "ora_inceput": "12:00",
+            "ora_final": "14:00",
+            "profesor": "Dragan M",
+            "materie": "ProiectareAsistDeCalGC",
+            "sala": "Sala L-204",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Dragan M",
+                "ProiectareAsistDeCalGC",
+                "L-204"
+            ]
+        },
+        {
+            "zi": "Marti",
+            "ora_inceput": "14:00",
+            "ora_final": "16:00",
+            "profesor": "Pascan R ",
+            "materie": "CalculNumeric",
+            "sala": "Sala L.218",
+            "grupa": "Grupa:1",
+            "saptamana": "Impar",
+            "date": [
+                "Pascan R ",
+                "CalculNumeric L.218"
+            ]
+        },
+        {
+            "zi": "Marti",
+            "ora_inceput": "14:00",
+            "ora_final": "16:00",
+            "profesor": "Pascan R ",
+            "materie": "CalculNumeric",
+            "sala": "Sala L.218",
+            "grupa": "Grupa:2",
+            "saptamana": "Par",
+            "date": [
+                "Pascan R ",
+                "CalculNumeric L.218"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "8:00",
+            "ora_final": "12:00",
+            "profesor": "Iftimie S / Tazlaoanu C",
+            "materie": "BazeElectroteh",
+            "sala": "Fac.Fizica-Magurele",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Iftimie S / Tazlaoanu C",
+                "BazeElectroteh",
+                "Fac.Fizica -Magurele"
+            ]
+        },
+        {
+            "zi": "Miercuri",
+            "ora_inceput": "13:00",
+            "ora_final": "15:00",
+            "profesor": "Tazlaoanu C",
+            "materie": "BazeElectroteh",
+            "sala": "Fac.Fizica-Magurele",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Tazlaoanu C",
+                "BazeElectroteh",
+                "Fac.Fizica -Magurele"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "10:00",
+            "ora_final": "12:00",
+            "profesor": "Boriga R",
+            "materie": "TehniciDeProgr",
+            "sala": "Amf. Hater (Et. 0)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Boriga R",
+                "TehniciDeProgr",
+                "O(Haret)"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "12:00",
+            "ora_final": "14:00",
+            "profesor": "Dragan M",
+            "materie": "ProiectareAsistDeCalc",
+            "sala": "Amf. Titeica (Et. 3)",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Dragan M",
+                "ProiectareAsistDeCalc",
+                "3(Titeica)"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "Stancu A",
+            "materie": "UtilizareaSO",
+            "sala": "Sala L.302A",
+            "grupa": "Grupa:2",
+            "saptamana": "Par",
+            "date": [
+                "Stancu A",
+                "UtilizareaSO",
+                "Gr 2 L.302A"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "8:00",
+            "ora_final": "10:00",
+            "profesor": "Mitre L",
+            "materie": "CalculNumeric",
+            "sala": "Sala 10",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Mitre L",
+                "CalculNumeric",
+                "10"
+            ]
+        },
+        {
+            "zi": "Vineri",
+            "ora_inceput": "10:00",
+            "ora_final": "12:00",
+            "profesor": "Micluta M",
+            "materie": "TehniciDeProgr",
+            "sala": "Sala L-309",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Micluta M",
+                "TehniciDeProgr",
+                "L-309"
+            ]
+        }
+    ]
+}
