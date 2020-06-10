@@ -341,6 +341,13 @@ def extract_classes_data(page_path):
                             grupa_processed += str(number) + ' '
                 else:
                     grupa_processed = 'none'
+
+                temp = re.findall(r'\d+', profesor)
+                res = list(map(int, temp))
+                if len(res):
+                    warnings.append("No teacher found")
+                    profesor += ' - none'
+
                 grupa = grupa_processed
                 profesor = profesor.replace('|', 'I')
                 materie = materie.replace('|', 'l')
@@ -370,7 +377,8 @@ import multiprocessing
 
 num_cores = multiprocessing.cpu_count()
 
-if __name__ == '__main__':
+
+def get_pages():
     start = time.time()
 
     with open('page.txt', 'w') as outfile:
@@ -379,13 +387,13 @@ if __name__ == '__main__':
         for filename in os.listdir(folder):
             paths.append(os.path.join(folder, filename))
         pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
-            delayed(extract_classes_data)(path) for path in paths[:10])
+            delayed(extract_classes_data)(path) for path in paths[:16])
         for pag in pagini:
             outfile.write(str(pag.titlu) + '\n')
             for ora in pag.ore:
                 outfile.write(str(ora) + '\n')
-
     print(time.time() - start)
+    return pagini
 
 # print_page_data(days, hours, classes)
 # # optime < 50 h

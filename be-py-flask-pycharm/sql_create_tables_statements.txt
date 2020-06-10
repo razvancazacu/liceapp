@@ -1,0 +1,23 @@
+CREATE TABLE `alchemydb`.`orare` (
+  `id_orar` INT NOT NULL AUTO_INCREMENT,
+  `nume_orar` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_orar`),
+  UNIQUE INDEX `nume_orar_UNIQUE` (`nume_orar` ASC) VISIBLE);
+
+CREATE TABLE `alchemydb`.`ore` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `id_orar` INT NOT NULL,
+  `ora_inceput` VARCHAR(45) NOT NULL,
+  `ora_final` VARCHAR(45) NOT NULL,
+  `profesor` VARCHAR(45) NULL,
+  `materie` VARCHAR(45) NOT NULL,
+  `sala` VARCHAR(45) NULL,
+  `saptamana` VARCHAR(45) NULL,
+  `grupa` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_orar_idx` (`id_orar` ASC) VISIBLE,
+  CONSTRAINT `id_orar`
+    FOREIGN KEY (`id_orar`)
+    REFERENCES `alchemydb`.`orare` (`id_orar`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
