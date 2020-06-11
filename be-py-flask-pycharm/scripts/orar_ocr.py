@@ -5,6 +5,8 @@ import os
 import time
 import json
 from scripts.utils import *
+from joblib import Parallel, delayed
+import multiprocessing
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -156,8 +158,19 @@ class Ora:
             self.materie) + "\nSala: " + str(self.sala) + "\nSaptamana: " + str(
             self.saptamana) + "\nGrupa: " + str(self.grupa)
 
-    def get_class_data(self):
-        print(self.date)
+    def __iter__(self):
+        yield self.zi
+        yield self.ora_inceput
+        yield self.ora_final
+        yield self.profesor
+        yield self.materie
+        yield self.sala
+        yield self.grupa
+        yield self.saptamana
+
+
+def get_class_data(self):
+    print(self.date)
 
 
 def get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings):
@@ -372,9 +385,6 @@ class Pagina:
                           indent=4)
 
 
-from joblib import Parallel, delayed
-import multiprocessing
-
 num_cores = multiprocessing.cpu_count()
 
 
@@ -387,7 +397,7 @@ def get_pages():
         for filename in os.listdir(folder):
             paths.append(os.path.join(folder, filename))
         pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
-            delayed(extract_classes_data)(path) for path in paths[:16])
+            delayed(extract_classes_data)(path) for path in paths[:5])
         for pag in pagini:
             outfile.write(str(pag.titlu) + '\n')
             for ora in pag.ore:
