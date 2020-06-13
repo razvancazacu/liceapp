@@ -53,6 +53,21 @@
             ]
         },
         {
+            "zi": "Marti",
+            "ora_inceput": "16:00",
+            "ora_final": "18:00",
+            "profesor": "Hristea F",
+            "materie": "SemCompsApiRegint",
+            "sala": "Sala L-322",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Hristea F",
+                "SemCompsApiRegint",
+                "L-322"
+            ]
+        },
+        {
             "zi": "Miercuri",
             "ora_inceput": "15:00",
             "ora_final": "16:00",
@@ -105,7 +120,7 @@
             "materie": "LingvMat&Comp",
             "sala": "Sala 215(Alg)",
             "grupa": "Grupa:3",
-            "saptamana": "Par",
+            "saptamana": "Impar / Par",
             "date": [
                 "Dinu L",
                 "LingvMat&Comp",
@@ -120,7 +135,7 @@
             "materie": "Text Mining",
             "sala": "Sala L.302A",
             "grupa": "Grupa:3",
-            "saptamana": "Par",
+            "saptamana": "Impar / Par",
             "date": [
                 "Popescu M",
                 "Text Mining",
@@ -140,6 +155,36 @@
                 "Hristea F",
                 "SemComp\u00e9AplReginf",
                 "202"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Hristea F",
+            "materie": "SemCom p&Apihed wit",
+            "sala": "Sala L.310",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Hristea F",
+                "SemCom p&Apihed wit",
+                "L.310"
+            ]
+        },
+        {
+            "zi": "Joi",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Hristea F",
+            "materie": "SemCom p&Apihed ft",
+            "sala": "Sala L-204",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Hristea F",
+                "SemCom p&Apihed ft",
+                "L-204"
             ]
         }
     ]

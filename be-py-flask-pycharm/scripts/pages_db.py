@@ -1,66 +1,72 @@
 import mysql.connector
 from mysql.connector import errorcode
 from scripts import orar_ocr
+import sqlalchemy as db
+from sqlalchemy.dialects.mysql import insert
+from sqlalchemy.orm import sessionmaker
 
 
-def check_table_exists(dbcon, tablename):
-    dbcur = dbcon.cursor()
-    dbcur.execute(("\n"
-                   "        SELECT COUNT(*)\n"
-                   "        FROM information_schema.tables\n"
-                   "        WHERE table_name = '{0}'\n"
-                   "        ").format(tablename.replace('\'', '\'\'')))
-    if dbcur.fetchone()[0] == 1:
-        dbcur.close()
-        return True
-
-    dbcur.close()
-    return False
+def insert_page_title(session, orare, page):
+    insert_stmt = insert(orare).values(nume_orar=page.titlu)
+    on_duplicate_key_stmt = insert_stmt.on_duplicate_key_update(nume_orar=insert_stmt.inserted.nume_orar)
+    session.execute(on_duplicate_key_stmt)
+    return session.execute(db.select([orare]).where(orare.columns.nume_orar == page.titlu)).fetchone()[0]
 
 
-def insert_mysql_hours(cnx,ore):
+def insert_warning(session, warnings, warning_data, page_id):
+    insert_stmt = insert(warnings).values(warning_details=warning_data, id_orar=page_id)
+    session.execute(insert_stmt)
 
-   try:
-        mysql_insert_query = """INSERT INTO Laptop (Id, Name, Price, Purchase_date) 
-                                  VALUES (%s, %s, %s, %s) """
 
-        records_to_insert = [(4, 'HP Pavilion Power', 1999, '2019-01-11'),
-                             (5, 'MSI WS75 9TL-496', 5799, '2019-02-27'),
-                             (6, 'Microsoft Surface', 2330, '2019-07-23')]
+def insert_hour(o, ore, page_id, session):
+    insert_stmt = insert(ore).values(
+        id_orar=page_id,
+        ora_inceput=o.ora_inceput,
+        ora_final=o.ora_final,
+        profesor=o.profesor,
+        materie=o.materie,
+        sala=o.sala,
+        saptamana=o.saptamana,
+        grupa=o.grupa
+    )
+    session.execute(insert_stmt)
 
-        cursor = cnx.cursor()
-        cursor.executemany(mysql_insert_query, records_to_insert)
-        cnx.commit()
-        print(cursor.rowcount, "Record inserted successfully into Laptop table")
 
-   except mysql.connector.Error as error:
-        print("Failed to insert record into MySQL table {}".format(error))
+def delete_old_table_data(session, schedules, hours, warnings):
+    session.execute(db.delete(hours))
+    session.execute(db.delete(schedules))
+    session.execute(db.delete(warnings))
 
 
 def mysql_connection(pages):
+    engine = db.create_engine('mysql://root:rootalchemy@localhost/alchemydb')
+    Session = sessionmaker(bind=engine)
+    session = Session()
     try:
-        cnx = mysql.connector.connect(user='root',
-                                      password='rootalchemy',
-                                      database='alchemydb')
-        print(check_table_exists(cnx, 'orare'))
+        metadata = db.MetaData()
+
+        schedules = db.Table('orare', metadata, autoload=True, autoload_with=engine)
+        hours = db.Table('ore', metadata, autoload=True, autoload_with=engine)
+        warnings = db.Table('warnings', metadata, autoload=True, autoload_with=engine)
+
+        delete_old_table_data(session, schedules, hours, warnings)
 
         for page in pages:
-            print(page.titlu)
+            page_id = insert_page_title(session, schedules, page)
+
+            for warn in page.warnings:
+                insert_warning(session, warnings, warn, page_id)
+
             for o in page.ore:
-                print(tuple(o))
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-        else:
-            print(err)
-    else:
-        cnx.close()
+                insert_hour(o, hours, page_id, session)
+
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 if __name__ == '__main__':
     mysql_connection(orar_ocr.get_pages())
-
-    values_to_insert = [(1, 2, 'a'), (3, 4, 'b'), (5, 6, 'c')]
-    print(type(values_to_insert[0]))

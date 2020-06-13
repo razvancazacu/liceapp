@@ -10,7 +10,7 @@
             "materie": "UtilizareaSO",
             "sala": "Sala L.310",
             "grupa": "Grupa:1",
-            "saptamana": "Impar",
+            "saptamana": "Impar / Par",
             "date": [
                 "Stancu A",
                 "UtilizareaSO",
@@ -201,7 +201,7 @@
             "materie": "UtilizareaSO",
             "sala": "Sala L.302A",
             "grupa": "Grupa:2",
-            "saptamana": "Par",
+            "saptamana": "Impar / Par",
             "date": [
                 "Stancu A",
                 "UtilizareaSO",

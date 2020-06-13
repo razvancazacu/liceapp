@@ -7,6 +7,7 @@ import json
 from scripts.utils import *
 from joblib import Parallel, delayed
 import multiprocessing
+import re
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -138,7 +139,7 @@ def get_cell_string(cell_img, psm='psm-3'):
 
 
 class Ora:
-    def __init__(self, zi, ora_inceput, ora_final, profesor, materie, sala, saptamana, grupa='', date=''):
+    def __init__(self, zi, ora_inceput, ora_final, profesor, materie, sala, saptamana, grupa='', date=[]):
         self.zi = zi
         self.ora_inceput = ora_inceput
         self.ora_final = ora_final
@@ -173,16 +174,18 @@ def get_class_data(self):
     print(self.date)
 
 
-def get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings):
+def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     cell_img = img_classes_col[y:y + h, x:x + int((2 * w) / 3)]
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
     left_part = filtered_part
-    cell_img = img_classes_col[y:y + h, x + int((2.1 * w) / 3):x + w]
+
+    cell_img = img_classes_col[y:y + h, x + int((2.3 * w) / 3):x + w]
     right_part = get_cell_string(cell_img)
     if len(right_part) == 0:
         right_part = get_cell_string(cell_img, psm="psm-10")
+
     right_part = right_part.splitlines()
     filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
     right_part = filtered_part
@@ -196,7 +199,7 @@ def get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings
         left_part[1] = left_part[1][:idx_gr_2]
     if grupa == 'none':
         warnings.append("Possible group required")
-    filtered = left_part + right_part
+    return left_part + right_part, grupa
 
 
 def extract_classes_data(page_path):
@@ -210,31 +213,17 @@ def extract_classes_data(page_path):
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
         if np.mean(cell_img) <= 250:  # skipping white cells
-
             grupa = 'none'
             materie = ''
             sala = ''
             filtered = []
             if h < 65:  # for 1/8 cells and 1/6
-                get_small_cell_values(grupa, filtered, img_classes_col, x, y, w, h, warnings)
+                filtered, grupa = get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings)
             else:
                 out = get_cell_string(cell_img)
                 words = out.splitlines()
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
             if len(filtered):
-
-                # calculate day
-                current_day = int(y / (days[-1][1] - days[-2][1]))
-
-                # Calculating if hour its weekly or once a odd/even week
-                _, day_cell_y, _, day_cell_h = days[current_day]
-                eps = 5
-                if (y + eps) >= day_cell_y + int(day_cell_h / 2):
-                    saptamana = "Par"
-                elif ((day_cell_h / 3) - 2 * eps) < h < ((day_cell_h / 3) + eps):  # treime ( 3 grupe saptamanal)
-                    saptamana = "Impar / Par"
-                else:
-                    saptamana = "Impar"
 
                 # Extracting the hour of the class
                 current_hour_idx = 0
@@ -245,7 +234,7 @@ def extract_classes_data(page_path):
 
                 if len(filtered) == 1:
                     warnings.append(
-                        "Cell" + str(indx) + "First run received only one data. Retrying with greyscale image and "
+                        "Cell" + str(indx) + "- First run received only one data. Retrying with greyscale image and "
                                              "isolating parts")
                     cell_img = img_classes_bit[y:y + h, x:x + w]
                     out = get_cell_string(cell_img)
@@ -259,8 +248,7 @@ def extract_classes_data(page_path):
                     warnings.append("Cell" + str(indx) + "Unsuccessful retry. ")
                     ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                                    hour_string[current_hour_idx + round((w / 260))], 'none', 'none', 'none', 'none',
-                                   'none', 'none',
-                                   filtered))
+                                   'none', []))
                     continue
 
                 # Case when cell has on the same row the teacher name and the group
@@ -339,7 +327,6 @@ def extract_classes_data(page_path):
                 elif sala.find('Fizica') == -1:
                     sala = "Sala " + sala
 
-                import re
                 temp = re.findall(r'\d+', grupa)
                 res = list(map(int, temp))
                 if len(res):
@@ -361,6 +348,21 @@ def extract_classes_data(page_path):
                     warnings.append("No teacher found")
                     profesor += ' - none'
 
+                # calculate day
+                current_day = int(y / (days[-1][1] - days[-2][1]))
+
+                # Calculating if hour its weekly or once a odd/even week
+                _, day_cell_y, _, day_cell_h = days[current_day]
+                eps = 5
+                if ((day_cell_h / 3) - 2 * eps) < h < ((day_cell_h / 3) + eps) \
+                        or (h + eps >= day_cell_h) or (
+                        (h + eps >= day_cell_h / 2) and grupa.find('Gr') != -1):  # 1/3 and full cell
+                    saptamana = "Impar / Par"
+                elif (y + eps) >= day_cell_y + int(day_cell_h / 2):
+                    saptamana = "Par"
+                else:
+                    saptamana = "Impar"
+
                 grupa = grupa_processed
                 profesor = profesor.replace('|', 'I')
                 materie = materie.replace('|', 'l')
@@ -371,6 +373,7 @@ def extract_classes_data(page_path):
                                hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                                grupa,
                                filtered))
+
     return Pagina(page_title, warnings, ore)
 
 
@@ -396,8 +399,9 @@ def get_pages():
         paths = []
         for filename in os.listdir(folder):
             paths.append(os.path.join(folder, filename))
+
         pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
-            delayed(extract_classes_data)(path) for path in paths[:5])
+            delayed(extract_classes_data)(path) for path in paths)
         for pag in pagini:
             outfile.write(str(pag.titlu) + '\n')
             for ora in pag.ore:
