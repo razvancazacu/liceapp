@@ -44,7 +44,7 @@ def get_cropped_classes_img(img):
 
 
 def get_binnary_img(img):
-    thresh, img_bin = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY)
+    thresh, img_bin = cv2.threshold(img, 115, 255, cv2.THRESH_BINARY)
     img_bin = 255 - img_bin
     return img_bin
 
@@ -57,16 +57,17 @@ def get_vh_lines_img(img):
     #     Defining a horizontal kernel to detect all horizontal lines of image
     hor_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_len, 1))
     #     A kernel of 2x2
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     img_bin = get_binnary_img(img)
     #     Use vertical kernel to detect and save the vertical lines in a jpg
     image_1 = cv2.erode(img_bin, ver_kernel, iterations=3)
     vertical_lines = cv2.dilate(image_1, ver_kernel, iterations=3)
-    cv2.imwrite("../poze-orar/out_0_vertical.jpg", vertical_lines)
+    cv2.imwrite("out_0_vertical.jpg", vertical_lines)
     #     Use horizontal kernel to detect and save the horizontal lines in a jpg
     image_2 = cv2.erode(img_bin, hor_kernel, iterations=3)
     horizontal_lines = cv2.dilate(image_2, hor_kernel, iterations=3)
-    cv2.imwrite("../poze-orar/out_0_horizontal.jpg", horizontal_lines)
+
+    cv2.imwrite("out_0_horizontal.jpg", horizontal_lines)
     #     Combine horizontal and vertical lines in a new third image, with both having same weight.
     img_vh = cv2.addWeighted(vertical_lines, 0.5, horizontal_lines, 1, 0.0)
     #     Eroding and thesholding the image
@@ -74,7 +75,7 @@ def get_vh_lines_img(img):
     img_vh = cv2.erode(~img_vh, kernel, iterations=2)
     thresh, img_vh = cv2.threshold(img_vh, 128, 255, cv2.THRESH_BINARY)
 
-    cv2.imwrite("../poze-orar/out_0_img_vh.jpg", img_vh)
+    cv2.imwrite("out_0_img_vh.jpg", img_vh)
     bitxor = cv2.bitwise_xor(img, img_vh)
     bitnot = cv2.bitwise_not(bitxor)
 
@@ -172,7 +173,7 @@ def get_class_data(self):
 
 
 def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
-    cell_img = img_classes_col[y:y + h, x:x + int((2 * w) / 3)]
+    cell_img = img_classes_col[y:y + h, x:x + int((1.9 * w) / 3)]
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
@@ -182,7 +183,6 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     right_part = get_cell_string(cell_img)
     if len(right_part) == 0:
         right_part = get_cell_string(cell_img, psm="psm-10")
-
     right_part = right_part.splitlines()
     filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
     right_part = filtered_part
@@ -227,6 +227,8 @@ def extract_classes_data(page_path):
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
         if np.mean(cell_img) <= 250:  # skipping white cells
+            # print_img(cell_img)
+
             grupa = 'none'
             materie = ''
             sala = ''

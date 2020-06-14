@@ -3,6 +3,20 @@
     "warnings": [],
     "ore": [
         {
+            "zi": "Luni",
+            "ora_inceput": "10:00",
+            "ora_final": "12:00",
+            "profesor": "Bordea D",
+            "materie": "Franceza",
+            "sala": "Sala 8",
+            "grupa": "none",
+            "saptamana": "Impar / Par",
+            "date": [
+                "Bordea D",
+                "Franceza"
+            ]
+        },
+        {
             "zi": "Marti",
             "ora_inceput": "16:00",
             "ora_final": "18:00",
