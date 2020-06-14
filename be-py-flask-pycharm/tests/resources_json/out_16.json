@@ -54,7 +54,7 @@
             "materie": "TehniciDeProgr",
             "sala": "Sala 8",
             "grupa": "none",
-            "saptamana": "Impar / Par",
+            "saptamana": "Impar",
             "date": [
                 "Toca L",
                 "TehniciDeProgr"
@@ -141,7 +141,7 @@
             "materie": "BazeElectroteh",
             "sala": "Fac.Fizica-Magurele",
             "grupa": "none",
-            "saptamana": "Impar / Par",
+            "saptamana": "Impar",
             "date": [
                 "Iftimie S / Tazlaoanu C",
                 "BazeElectroteh",
@@ -216,7 +216,7 @@
             "materie": "CalculNumeric",
             "sala": "Sala 10",
             "grupa": "none",
-            "saptamana": "Impar / Par",
+            "saptamana": "Impar",
             "date": [
                 "Mitre L",
                 "CalculNumeric",

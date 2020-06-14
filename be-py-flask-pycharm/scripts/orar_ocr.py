@@ -147,10 +147,7 @@ class Ora:
         self.materie = materie
         self.sala = sala
         self.grupa = grupa
-        if len(grupa) == 0 or grupa == 'none':
-            self.saptamana = "Impar / Par"
-        else:
-            self.saptamana = saptamana
+        self.saptamana = saptamana
         self.date = date
 
     def __str__(self):
@@ -200,6 +197,23 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     if grupa == 'none':
         warnings.append("Possible group required")
     return left_part + right_part, grupa
+
+
+def is_every_week_hour(day_cell_h, current_cell_height, grupa):
+    # print('day_cell_h', day_cell_h, 'current_cell_height', current_cell_height, 'grupa', grupa)
+    eps = 5
+    cell_third = day_cell_h / 3
+    cell_half = day_cell_h / 2
+    return ((cell_third - 2 * eps) < current_cell_height < (cell_third + eps)) or (
+            current_cell_height + eps >= day_cell_h) or (
+                   (current_cell_height + eps >= cell_half) and grupa.find('Gr') != -1)
+
+
+def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
+    # print('current_cell_y', current_cell_y, 'day_cell_y', day_cell_y, 'day_cell_h', day_cell_h)
+    eps = 5
+    day_cell_half_height = int(day_cell_h / 2)
+    return (current_cell_y + eps) >= day_cell_y + day_cell_half_height
 
 
 def extract_classes_data(page_path):
@@ -261,7 +275,7 @@ def extract_classes_data(page_path):
 
                 # Rare case of missreading 'Gr' as 'G r'
                 if len(filtered) == 4:
-                    filtered[1] += filtered[2]  # posibila inlocuire : read until no number meet Gr__4
+                    filtered[1] += filtered[2]
                     filtered.pop(2)
 
                 if len(filtered) == 2:
@@ -353,12 +367,9 @@ def extract_classes_data(page_path):
 
                 # Calculating if hour its weekly or once a odd/even week
                 _, day_cell_y, _, day_cell_h = days[current_day]
-                eps = 5
-                if ((day_cell_h / 3) - 2 * eps) < h < ((day_cell_h / 3) + eps) \
-                        or (h + eps >= day_cell_h) or (
-                        (h + eps >= day_cell_h / 2) and grupa.find('Gr') != -1):  # 1/3 and full cell
+                if is_every_week_hour(day_cell_h, h, grupa):  # 1/2 cell that happens in every week
                     saptamana = "Impar / Par"
-                elif (y + eps) >= day_cell_y + int(day_cell_h / 2):
+                elif is_once_even_week_hour(y, day_cell_y, day_cell_h):
                     saptamana = "Par"
                 else:
                     saptamana = "Impar"
@@ -371,9 +382,7 @@ def extract_classes_data(page_path):
                 profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
                 ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                                hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
-                               grupa,
-                               filtered))
-
+                               grupa, filtered))
     return Pagina(page_title, warnings, ore)
 
 
