@@ -31,9 +31,13 @@ def insert_hour(o, ore, page_id, session):
 
 
 def delete_old_table_data(session, schedules, hours, warnings):
+    reset_increment_statement = """ALTER TABLE warnings AUTO_INCREMENT = 1; 
+                                 ALTER TABLE orare AUTO_INCREMENT = 1;
+                                ALTER TABLE ore AUTO_INCREMENT = 1;"""
     session.execute(db.delete(hours))
     session.execute(db.delete(warnings))
     session.execute(db.delete(schedules))
+    session.execute(reset_increment_statement)
 
 
 def mysql_connection(pages):

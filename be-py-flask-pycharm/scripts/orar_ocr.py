@@ -195,7 +195,7 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
         grupa = left_part[1][idx_gr_2:]
         left_part[1] = left_part[1][:idx_gr_2]
     if grupa == 'none':
-        warnings.append("Possible group required")
+        warnings.append("Possible group required (Overlapped text)")
     return left_part + right_part, grupa
 
 
