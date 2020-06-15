@@ -1,5 +1,3 @@
-import mysql.connector
-from mysql.connector import errorcode
 from scripts import orar_ocr
 import sqlalchemy as db
 from sqlalchemy.dialects.mysql import insert
@@ -34,8 +32,8 @@ def insert_hour(o, ore, page_id, session):
 
 def delete_old_table_data(session, schedules, hours, warnings):
     session.execute(db.delete(hours))
-    session.execute(db.delete(schedules))
     session.execute(db.delete(warnings))
+    session.execute(db.delete(schedules))
 
 
 def mysql_connection(pages):

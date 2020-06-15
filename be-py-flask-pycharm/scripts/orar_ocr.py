@@ -227,7 +227,6 @@ def extract_classes_data(page_path):
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
         if np.mean(cell_img) <= 250:  # skipping white cells
-            # print_img(cell_img)
 
             grupa = 'none'
             materie = ''
@@ -255,9 +254,11 @@ def extract_classes_data(page_path):
                     cell_img = img_classes_bit[y:y + h, x:x + w]
                     out = get_cell_string(cell_img)
                     words = out.splitlines()
-                    cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
-                    out = get_cell_string(cell_img, psm="psm-10")
-                    words += out.splitlines()
+                    if len(words) < 2:
+                        cell_img = img_classes_bit[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+                        out = get_cell_string(cell_img, psm="psm-10")
+                        words += out.splitlines()
+
                     filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
 
                 if len(filtered) <= 1:
@@ -304,7 +305,6 @@ def extract_classes_data(page_path):
                     else:
                         warnings.append("No received data")
                 elif len(filtered) == 3:
-
                     materie = filtered[1]
                     partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
 
@@ -375,7 +375,6 @@ def extract_classes_data(page_path):
                     saptamana = "Par"
                 else:
                     saptamana = "Impar"
-
                 grupa = grupa_processed
                 profesor = profesor.replace('|', 'I')
                 materie = materie.replace('|', 'l')
