@@ -178,6 +178,7 @@ def get_class_data(self):
 
 def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     cell_img = img_classes_col[y:y + h, x:x + int((1.9 * w) / 3)]
+    print_img(cell_img)
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
@@ -190,16 +191,41 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     right_part = right_part.splitlines()
     filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
     right_part = filtered_part
+
     idx_gr = left_part[1].find('Gr')
     idx_gr_2 = left_part[1].find('G r')
+
     if idx_gr != -1:
         grupa = left_part[1][idx_gr:]
         left_part[1] = left_part[1][:idx_gr]
     elif idx_gr_2 != -1:
         grupa = left_part[1][idx_gr_2:]
         left_part[1] = left_part[1][:idx_gr_2]
+
+    idx_gr = right_part[0].find('Gr')
+    idx_gr_2 = right_part[0].find('G r')
+    if idx_gr != -1:
+        grupa = right_part[0][idx_gr:]
+        right_part[0] = right_part[0][:idx_gr]
+    elif idx_gr_2 != -1:
+        grupa = right_part[0][idx_gr_2:]
+        left_part[0] = right_part[0][:idx_gr_2]
     if grupa == 'none':
         warnings.append("Possible group required (Overlapped text)")
+    print(';------------------------------')
+    print(left_part)
+    print(right_part)
+    # The second argument is the teacher name
+    # Swapping needed for further processing
+    words = left_part[1].split()
+    filtered_left_part = [word for word in words if (len(word) >= 1) and (word != ' ')]
+
+    if len(filtered_left_part) == 2 and len(filtered_left_part[1]) == 1:
+        left_part[0], left_part[1] = left_part[1], left_part[0]
+    elif len(filtered_left_part) == 1 and re.match('[A-Z]+[a-z]+[A-Z]$', filtered_left_part[0]):
+        left_part[1] = left_part[1][:-1] + " " + left_part[1][-1]
+        left_part[0], left_part[1] = left_part[1], left_part[0]
+
     return left_part + right_part, grupa
 
 
@@ -246,7 +272,7 @@ def extract_classes_data(page_path):
                 out = get_cell_string(cell_img)
                 words = out.splitlines()
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
-            # print(filtered)
+            print(filtered)
             current_hour_idx = extract_starting_hour(hours, x)
 
             if len(filtered) <= 1:
@@ -290,7 +316,6 @@ def extract_classes_data(page_path):
                     if filtered[1].find('G') == -1:
                         new_w += filtered[1]
                         filtered.pop(1)
-                print("new word", new_w)
                 filtered[1] = new_w + filtered[1]
                 # print("filtered after", filtered)
 
@@ -300,6 +325,7 @@ def extract_classes_data(page_path):
 
                 if len(partitioning) >= 3:
                     if partitioning[0].find('G') != -1 or partitioning[0].find('SE'):
+                        print(partitioning)
                         grupa = ''.join(partitioning[:-1])
                         sala = partitioning[-1]
 
@@ -342,7 +368,7 @@ def extract_classes_data(page_path):
 
             temp = re.findall(r'\d+', profesor)
             res = list(map(int, temp))
-            if len(res):
+            if len(res) or profesor == '':
                 warnings.append("No teacher found")
                 profesor += ' - none'
 
@@ -366,7 +392,7 @@ def extract_classes_data(page_path):
             ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                            hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                            grupa, filtered))
-            # print('\n', ore[-1])
+            print('\n', ore[-1])
     return Pagina(page_title, warnings, ore)
 
 
@@ -390,6 +416,7 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y):
         sala = "Sala " + '2'
     elif sala.find('Fiz') == -1:
         sala = "Sala " + sala
+
     temp = re.findall(r'\d+', grupa)
     res = list(map(int, temp))
 
@@ -436,24 +463,17 @@ num_cores = multiprocessing.cpu_count()
 def get_pages():
     start = time.time()
 
-    with open('page.txt', 'w') as outfile:
-        folder = os.path.dirname(os.path.abspath('../tmp/300dpi_sem_2/pages'))
-        paths = []
-        for filename in os.listdir(folder):
-            paths.append(os.path.join(folder, filename))
+    # with open('page.txt', 'w') as outfile:
+    folder = os.path.dirname(os.path.abspath('../tmp/300dpi_sem_2/pages'))
+    paths = []
+    for filename in os.listdir(folder):
+        paths.append(os.path.join(folder, filename))
 
-        pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
-            delayed(extract_classes_data)(path) for path in paths)
-        for pag in pagini:
-            outfile.write(str(pag.titlu) + '\n')
-            for ora in pag.ore:
-                outfile.write(str(ora) + '\n')
+    pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
+        delayed(extract_classes_data)(path) for path in paths)
+    # for pag in pagini:
+    #     outfile.write(str(pag.titlu) + '\n')
+    #     for ora in pag.ore:
+    #         outfile.write(str(ora) + '\n')
     print(time.time() - start)
     return pagini
-
-# print_page_data(days, hours, classes)
-# # optime < 50 h
-# # patrime >65 <100
-# # sesime >55 <65..
-# # jumatati aprox 190
-# # luni-vineri heigh = aprox(380).
