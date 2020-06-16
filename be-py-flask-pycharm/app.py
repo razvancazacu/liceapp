@@ -1,8 +1,8 @@
 from flask import Flask
-from flask_restful import Resource, Api
-from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_restful import Api
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:rootalchemy@localhost/alchemydb'
@@ -15,7 +15,6 @@ db = SQLAlchemy(app)
 
 class OrareModel(db.Model):
     __tablename__ = 'orare'
-
     id_orar = db.Column(db.Integer, primary_key=True)
     nume_orar = db.Column(db.String(100))
 
@@ -26,6 +25,7 @@ class OrareModel(db.Model):
 class OrareView(ModelView):
     page_size = 50
     column_searchable_list = ['nume_orar']
+    column_filters = ['nume_orar']
 
 
 class OreModel(db.Model):
@@ -41,13 +41,12 @@ class OreModel(db.Model):
     saptamana = db.Column(db.String(45))
     grupa = db.Column(db.String(45))
     orar = db.relationship('OrareModel', backref='ora_to_orar')
-    # orar = db.relationship("OrareModel",
-    # primaryjoin="and_(OrareModel.id_orar==OreModel.id_orar)")
 
 
 class OreView(ModelView):
     page_size = 50
-    column_searchable_list = ('sala', 'materie', 'orar.nume_orar')
+    column_searchable_list = ('sala', 'materie', 'orar.nume_orar', 'profesor')
+    column_filters = ('sala', 'materie', 'orar.nume_orar', 'profesor')
 
 
 class WarningsModel(db.Model):
@@ -61,6 +60,7 @@ class WarningsModel(db.Model):
 class WarningsView(ModelView):
     page_size = 50
     column_searchable_list = ('orar.nume_orar', 'warning_details')
+    column_filters = ('orar.nume_orar', 'warning_details')
 
 
 admin.add_view(OrareView(OrareModel, db.session))

@@ -1,6 +1,6 @@
-import sys
-from scripts.orar_ocr import *
 import unittest
+
+from scripts.orar_ocr import *
 
 
 class TestPageReading(unittest.TestCase):
@@ -44,6 +44,30 @@ class TestPageReading(unittest.TestCase):
             # test_file.write(page.to_json())
             json_string = test_file.read()
             self.assertEqual(json_string, page.to_json())
+
+    def test_sem2_class_401(self):
+        test_dir_path = 'resources_img/'
+        page = extract_classes_data(test_dir_path + 'out_sem2_401.jpg')
+        with open('resources_json/out_sem2_401.json', 'r') as test_file:
+            # test_file.write(page.to_json())
+            json_string = test_file.read()
+            self.assertEqual(json_string, page.to_json())
+
+    def test_sem2_class_402(self):
+        test_dir_path = 'resources_img/'
+        page = extract_classes_data(test_dir_path + 'out_sem2_402.jpg')
+        with open('resources_json/out_sem2_402.json', 'r') as test_file:
+            # test_file.write(page.to_json())
+            json_string = test_file.read()
+            self.assertEqual(json_string, page.to_json())
+
+    def test_sem2_class_406(self):
+        test_dir_path = 'resources_img/'
+        page = extract_classes_data(test_dir_path + 'out_sem2_406.jpg')
+        # with open('resources_json/out_sem2_75.json', 'r') as test_file:
+        #     # test_file.write(page.to_json())
+        #     json_string = test_file.read()
+        #     self.assertEqual(json_string, page.to_json())
 
 
 if __name__ == '__main__':

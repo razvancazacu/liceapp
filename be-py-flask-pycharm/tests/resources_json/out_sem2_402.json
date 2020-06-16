@@ -1,0 +1,94 @@
+{
+  "titlu": "MATE Master 402 (MD - Matematica didactica)",
+  "warnings": [
+    "Cell9- First run received only one data. Retrying with greyscale image and isolating parts",
+    "Extracted more words than anticipated. Verify if correct"
+  ],
+  "ore": [
+    {
+      "zi": "Luni",
+      "ora_inceput": "17:00",
+      "ora_final": "20:00",
+      "profesor": "Gica A",
+      "materie": "MateDiscrete",
+      "sala": "Sala 1",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Gica A",
+        "MateDiscrete"
+      ]
+    },
+    {
+      "zi": "Marti",
+      "ora_inceput": "17:00",
+      "ora_final": "20:00",
+      "profesor": "Vuletescu V",
+      "materie": "Met&AlgoCalcul",
+      "sala": "Sala 1",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Vuletescu V",
+        "Met&AlgoCalcul"
+      ]
+    },
+    {
+      "zi": "Miercuri",
+      "ora_inceput": "17:00",
+      "ora_final": "20:00",
+      "profesor": "Baetica C",
+      "materie": "Rez&PropPbMate",
+      "sala": "Sala 3",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Baetica C",
+        "Rez&PropPbMate"
+      ]
+    },
+    {
+      "zi": "Joi",
+      "ora_inceput": "17:00",
+      "ora_final": "20:00",
+      "profesor": "Fat S",
+      "materie": "TeorlnvAdolTin&Adulti",
+      "sala": "Sala 2D",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Fat S",
+        "TeorlnvAdolTin&Adulti"
+      ]
+    },
+    {
+      "zi": "Vineri",
+      "ora_inceput": "10:00",
+      "ora_final": "12:00",
+      "profesor": "Georgescu Gi",
+      "materie": "Deontologieacademica [din 1noiembrie]",
+      "sala": "Amf. Titeica (Et. 3)",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Georgescu Gi",
+        "Deontologieacademica [din 1noiembrie]",
+        "3(Titeica)"
+      ]
+    },
+    {
+      "zi": "Vineri",
+      "ora_inceput": "17:00",
+      "ora_final": "20:00",
+      "profesor": "Voica C",
+      "materie": "IntrCercetDidact",
+      "sala": "Sala 3",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Voica C",
+        "IntrCercetDidact"
+      ]
+    }
+  ]
+}
