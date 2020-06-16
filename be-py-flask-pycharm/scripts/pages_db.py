@@ -25,7 +25,8 @@ def insert_hour(o, ore, page_id, session):
         materie=o.materie,
         sala=o.sala,
         saptamana=o.saptamana,
-        grupa=o.grupa
+        grupa=o.grupa,
+        zi=o.zi
     )
     session.execute(insert_stmt)
 
