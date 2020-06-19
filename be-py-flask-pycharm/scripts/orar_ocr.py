@@ -13,6 +13,9 @@ from scripts.utils import *
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
+TEACHER_REGEX = '[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$'
+TEACHER_REGEX_NO_SPACE = '[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$'
+
 
 def print_img(img):
     cv2.imshow('img', img)
@@ -171,9 +174,8 @@ class Ora:
         yield self.grupa
         yield self.saptamana
 
-
-def get_class_data(self):
-    print(self.date)
+    def get_class_data(self):
+        print(self.date)
 
 
 def is_every_week_hour(day_cell_h, current_cell_height, grupa):
@@ -183,7 +185,7 @@ def is_every_week_hour(day_cell_h, current_cell_height, grupa):
     cell_half = day_cell_h / 2
     return ((cell_third - 2 * eps) < current_cell_height < (cell_third + eps)) or (
             current_cell_height + eps >= day_cell_h) or (
-                   (current_cell_height + eps >= cell_half) and grupa.find('Gr') != -1)
+            (current_cell_height + eps >= cell_half) and ('Gr' in grupa))
 
 
 def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
@@ -194,7 +196,7 @@ def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
 
 
 def add_space_to_teacher(teacher_string):
-    if teacher_string.find('indu') == -1:
+    if 'indu' not in teacher_string:
         if sum(1 for c in teacher_string if c.isupper()) == 2:
             teacher_string = teacher_string[:-1] + " " + teacher_string[-1:]
         else:
@@ -203,11 +205,13 @@ def add_space_to_teacher(teacher_string):
 
 
 def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
+    # left part
     cell_img = img_classes_col[y:y + h, x:x + int((1.9 * w) / 3)]
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
     left_part = filtered_part
+    # right part
     cell_img = img_classes_col[y:y + h, x + int((2.3 * w) / 3):x + w]
     right_part = get_cell_string(cell_img)
     if len(right_part) == 0:
@@ -220,37 +224,34 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     # Swapping needed for further processing
     words = left_part[1].split()
     filtered_left_part = [word for word in words if (len(word) >= 1) and (word != ' ')]
-    print(filtered_left_part)
+    # print(filtered_left_part)
 
-    if len(filtered_left_part) >= 2 and re.match('[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$',
-                                                 filtered_left_part[0] + filtered_left_part[1]) or left_part[1].find(
-        'indu') != -1:
+    if len(filtered_left_part) >= 2 and re.match(TEACHER_REGEX,
+                                                 filtered_left_part[0] + filtered_left_part[1]) or (
+            'indu' in left_part[1]):
         left_part[0], left_part[1] = left_part[1], left_part[0]
-    elif (len(filtered_left_part) == 1 and re.match('[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$', filtered_left_part[0])) or \
-            filtered_left_part[0].find('indu') != -1:
+    elif (len(filtered_left_part) == 1 and re.match(TEACHER_REGEX_NO_SPACE, filtered_left_part[0])) or (
+            'indu' in filtered_left_part[0]):
         left_part[1] = add_space_to_teacher(left_part[1])
         left_part[0], left_part[1] = left_part[1], left_part[0]
 
     idx_gr = left_part[1].find('Gr')
     idx_gr_2 = left_part[1].find('G r')
-
     if idx_gr != -1:
         grupa = left_part[1][idx_gr:]
         left_part[1] = left_part[1][:idx_gr]
     elif idx_gr_2 != -1:
         grupa = left_part[1][idx_gr_2:]
         left_part[1] = left_part[1][:idx_gr_2]
-
-    idx_gr = right_part[0].find('Gr')
-    idx_gr_2 = right_part[0].find('G r')
-    if idx_gr != -1:
-        grupa = right_part[0][idx_gr:]
-        right_part[0] = right_part[0][:idx_gr]
-    elif idx_gr_2 != -1:
-        grupa = right_part[0][idx_gr_2:]
-        left_part[0] = right_part[0][:idx_gr_2]
-    if grupa == 'none':
-        warnings.append("WARN:Possible group required (Overlapped text)")
+    else:
+        idx_gr = right_part[0].find('Gr')
+        idx_gr_2 = right_part[0].find('G r')
+        if idx_gr != -1:
+            grupa = right_part[0][idx_gr:]
+            right_part[0] = right_part[0][:idx_gr]
+        elif idx_gr_2 != -1:
+            grupa = right_part[0][idx_gr_2:]
+            left_part[0] = right_part[0][:idx_gr_2]
 
     return left_part + right_part, grupa
 
@@ -273,7 +274,6 @@ def extract_classes_data(page_path):
             grupa = 'none'
             materie = ''
             sala = ''
-            filtered = []
 
             if h < 65:  # for 1/8 cells and 1/6
                 filtered, grupa = get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings)
@@ -285,9 +285,6 @@ def extract_classes_data(page_path):
             current_hour_idx = extract_starting_hour(hours, x)
 
             if len(filtered) <= 1:
-                warnings.append(
-                    "Cell" + str(indx) + "- First run received only one data. Retrying with greyscale image and "
-                                         "isolating parts")
                 cell_img = img_classes_bit[y:y + h, x:x + w]
                 out = get_cell_string(cell_img)
                 words = out.splitlines()
@@ -299,7 +296,7 @@ def extract_classes_data(page_path):
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
 
             if len(filtered) <= 1:
-                warnings.append("Cell" + str(indx) + "Unsuccessful retry. ")
+                warnings.append("Cell " + str(indx) + "Unsuccessful retry. ")
                 ore.append(Ora(day_string[0], hour_string[current_hour_idx],
                                hour_string[current_hour_idx + round((w / 260))], 'none', 'none', 'none', 'none',
                                'none', []))
@@ -314,40 +311,40 @@ def extract_classes_data(page_path):
                 profesor = filtered[0]
 
             # Rare case of missreading 'Gr' as 'G r' or words splitted
-            if len(filtered) == 4:
+            size_of_filtered = len(filtered)
+            if size_of_filtered == 4:
                 filtered[1] += filtered[2]
                 filtered.pop(2)
 
-            elif len(filtered) > 4:
+            # Extracted more words than anticipated.
+            elif size_of_filtered > 4:
                 # print("filtered before", filtered)
-                warnings.append("WARN:Extracted more words than anticipated.")
                 new_w = ""
                 while len(filtered) > 3:
-                    if filtered[1].find('G') == -1:
+                    if 'G' not in filtered[1]:
                         new_w += filtered[1]
                         filtered.pop(1)
                 filtered[1] = new_w + filtered[1]
 
-            if len(filtered) == 3:
+            size_of_filtered = len(filtered)
+            if size_of_filtered == 3:
                 materie = filtered[1]
                 partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
                 if len(partitioning) >= 3:
-                    if partitioning[0].find('G') != -1 or partitioning[0].find('SE'):
+                    if any(word in partitioning[0] for word in {'G', 'SE', 'CU', 'se'}):
                         grupa = ''.join(partitioning[:-1])
                         sala = partitioning[-1]
-
-                elif len(partitioning) == 2 and partitioning[0].find('G') != -1:
+                elif len(partitioning) == 2 and ('G' in partitioning[0]):
                     grupa = partitioning[0]
                     sala = partitioning[1]
                 else:
-                    if partitioning[0].find('Gr') != -1 or partitioning[0].find('G r') != -1:
+                    if any(word in partitioning[0] for word in {'Gr', 'G r'}):
                         grupa = ''.join(partitioning)
                         sala = 'none'
                         warnings.append("No classroom found")
                     else:
                         sala = ''.join(partitioning)
-
-            elif len(filtered) == 2:
+            elif size_of_filtered == 2:
                 gr_in_first = filtered[0].find('Gr')
                 gr_in_first_2 = filtered[0].find('G r')
                 if gr_in_first != -1:
@@ -358,18 +355,17 @@ def extract_classes_data(page_path):
                     filtered[0] = filtered[0].replace(grupa, '')
 
                 swap_prof_materie = False
-                if re.match('[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$', filtered[0]):
+                if re.match(TEACHER_REGEX_NO_SPACE, filtered[0]):
                     profesor = filtered[0]
                     profesor = add_space_to_teacher(profesor)
-                    print("space needed", filtered)
-                elif re.match('[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$', filtered[0]) or filtered[0].find(
-                        'indu') != -1:
+                    # print("space needed", filtered)
+                elif re.match(TEACHER_REGEX, filtered[0]) or ('indu' in filtered[0]):
                     profesor = filtered[0]
-                    print("No change, no space", filtered)
+                    # print("No change, no space", filtered)
                 else:
                     materie = filtered[0]
                     swap_prof_materie = True
-                    print("space not needed, change needed", filtered)
+                    # print("space not needed, change needed", filtered)
 
                 words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
                 # print('materie', materie, 'profesor', profesor)
@@ -394,12 +390,18 @@ def extract_classes_data(page_path):
 
             # Case of 1/3 or 1/4 cells that dont have a group.
             # Isolating cell part of group.
-            if 70 < h < 100 and grupa == 'none':
+            # print(grupa)
+            temp = re.findall(r'\d+', grupa)
+            res = list(map(int, temp))
+
+            if 50 < h < 100 and len(res) == 0:
                 cell_img = img_classes_gray[y:y + int(h / 2), x + int((2.4 * w) / 3):x + w]
                 grupa = get_cell_string(cell_img)
                 # print_img(cell_img)
+                # print(grupa)
             # print(grupa)
-            grupa, grupa_processed, sala = classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y)
+            grupa, grupa_processed, sala = classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y,
+                                                                         warnings)
             # print(grupa, grupa_processed)
 
             temp = re.findall(r'\d+', profesor)
@@ -438,30 +440,28 @@ def get_week_type(day_cell_h, day_cell_y, grupa, h, y):
     return saptamana
 
 
-def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y):
+def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, warnings):
     if sala == '':
         cell_img = img_classes_gray[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # cell_img = img_classes_gray[y + int((1.8 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
-        print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS", sala)
-    if sala.find("Ha") != -1:
+    if "Ha" in sala:
         sala = "Amf. Hater (Et. 0)"
-    elif sala.find("St") != -1:
+    elif "St" in sala:
         sala = "Amf. Stoilow (Et. 1)"
-    elif sala.find("Po") != -1:
+    elif "Po" in sala:
         sala = "Amf. Pompeiu (Et. 2)"
-    elif sala.find("Ti") != -1:
+    elif "Ti" in sala:
         sala = "Amf. Titeica (Et. 3)"
-    elif sala.find("Chim") != -1:
+    elif "Chim" in sala:
         sala = "Amf. R1 (Et. 1, Fac. Chimie)"
     elif sala == 'O':
         sala = "Sala " + '0'
     elif sala == 'Z' or sala == 'S':
         sala = "Sala " + '2'
-    elif sala.find('Fiz') == -1:
+    elif 'Fiz' not in sala:
         sala = "Sala " + sala
-
     temp = re.findall(r'\d+', grupa)
     res = list(map(int, temp))
 
@@ -477,6 +477,8 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y):
                 grupa_processed += str(number) + ' '
     else:
         grupa_processed = 'none'
+        if h < 100:
+            warnings.append("WARN: Possible group required")
 
     return grupa, grupa_processed, sala
 

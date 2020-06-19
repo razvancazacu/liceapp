@@ -1,10 +1,10 @@
 {
     "titlu": "INFO Master 507 (IA - Inteligenta artificiala)",
     "warnings": [
-      "WARN:Possible group required (Overlapped text)",
+      "WARN: Possible group required",
       "No classroom found",
-      "WARN:Possible group required (Overlapped text)",
-      "WARN:Possible group required (Overlapped text)"
+      "WARN: Possible group required",
+      "WARN: Possible group required"
     ],
     "ore": [
         {

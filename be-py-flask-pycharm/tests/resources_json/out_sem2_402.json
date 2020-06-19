@@ -1,9 +1,6 @@
 {
   "titlu": "MATE Master 402 (MD - Matematica didactica)",
-  "warnings": [
-    "Cell9- First run received only one data. Retrying with greyscale image and isolating parts",
-    "WARN:Extracted more words than anticipated."
-  ],
+  "warnings": [],
   "ore": [
     {
       "zi": "Luni",
