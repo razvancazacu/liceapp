@@ -1,9 +1,9 @@
 {
   "titlu": "MATE Master 401 (ASM - Advanced studies in mathematics)",
   "warnings": [
-    "Extracted more words than anticipated. Verify if correct",
+    "WARN:Extracted more words than anticipated.",
     "Cell19- First run received only one data. Retrying with greyscale image and isolating parts",
-    "Extracted more words than anticipated. Verify if correct"
+    "WARN:Extracted more words than anticipated."
   ],
   "ore": [
     {

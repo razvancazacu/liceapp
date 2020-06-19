@@ -4,6 +4,7 @@ from scripts.orar_ocr import *
 
 
 class TestPageReading(unittest.TestCase):
+    maxDiff = None
 
     def test_page16(self):
         test_dir_path = 'resources_img/'
@@ -61,9 +62,27 @@ class TestPageReading(unittest.TestCase):
             json_string = test_file.read()
             self.assertEqual(json_string, page.to_json())
 
+    def test_sem2_class_405(self):
+        test_dir_path = 'resources_img/'
+        page = extract_classes_data(test_dir_path + 'out_sem2_405.jpg')
+        with open('resources_json/out_sem2_405.json', 'r') as test_file:
+            # test_file.write(page.to_json())
+            json_string = test_file.read()
+            self.assertEqual(json_string, page.to_json())
+
+    # TODO
     def test_sem2_class_406(self):
         test_dir_path = 'resources_img/'
         page = extract_classes_data(test_dir_path + 'out_sem2_406.jpg')
+        # with open('resources_json/out_sem2_75.json', 'r') as test_file:
+        #     # test_file.write(page.to_json())
+        #     json_string = test_file.read()
+        #     self.assertEqual(json_string, page.to_json())
+
+    # TODO
+    def test_sem2_class_507(self):
+        test_dir_path = 'resources_img/'
+        page = extract_classes_data(test_dir_path + 'out_sem2_507.jpg')
         # with open('resources_json/out_sem2_75.json', 'r') as test_file:
         #     # test_file.write(page.to_json())
         #     json_string = test_file.read()

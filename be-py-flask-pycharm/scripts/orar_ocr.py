@@ -176,14 +176,38 @@ def get_class_data(self):
     print(self.date)
 
 
+def is_every_week_hour(day_cell_h, current_cell_height, grupa):
+    # print('day_cell_h', day_cell_h, 'current_cell_height', current_cell_height, 'grupa', grupa)
+    eps = 5
+    cell_third = day_cell_h / 3
+    cell_half = day_cell_h / 2
+    return ((cell_third - 2 * eps) < current_cell_height < (cell_third + eps)) or (
+            current_cell_height + eps >= day_cell_h) or (
+                   (current_cell_height + eps >= cell_half) and grupa.find('Gr') != -1)
+
+
+def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
+    # print('current_cell_y', current_cell_y, 'day_cell_y', day_cell_y, 'day_cell_h', day_cell_h)
+    eps = 5
+    day_cell_half_height = int(day_cell_h / 2)
+    return (current_cell_y + eps) >= day_cell_y + day_cell_half_height
+
+
+def add_space_to_teacher(teacher_string):
+    if teacher_string.find('indu') == -1:
+        if sum(1 for c in teacher_string if c.isupper()) == 2:
+            teacher_string = teacher_string[:-1] + " " + teacher_string[-1:]
+        else:
+            teacher_string = teacher_string[:-2] + " " + teacher_string[-2:]
+    return teacher_string
+
+
 def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     cell_img = img_classes_col[y:y + h, x:x + int((1.9 * w) / 3)]
-    print_img(cell_img)
     left_part = get_cell_string(cell_img)
     left_part = left_part.splitlines()
     filtered_part = [word for word in left_part if len(word) > 4]
     left_part = filtered_part
-
     cell_img = img_classes_col[y:y + h, x + int((2.3 * w) / 3):x + w]
     right_part = get_cell_string(cell_img)
     if len(right_part) == 0:
@@ -191,6 +215,21 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
     right_part = right_part.splitlines()
     filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
     right_part = filtered_part
+
+    # The second argument is the teacher name
+    # Swapping needed for further processing
+    words = left_part[1].split()
+    filtered_left_part = [word for word in words if (len(word) >= 1) and (word != ' ')]
+    print(filtered_left_part)
+
+    if len(filtered_left_part) >= 2 and re.match('[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$',
+                                                 filtered_left_part[0] + filtered_left_part[1]) or left_part[1].find(
+        'indu') != -1:
+        left_part[0], left_part[1] = left_part[1], left_part[0]
+    elif (len(filtered_left_part) == 1 and re.match('[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$', filtered_left_part[0])) or \
+            filtered_left_part[0].find('indu') != -1:
+        left_part[1] = add_space_to_teacher(left_part[1])
+        left_part[0], left_part[1] = left_part[1], left_part[0]
 
     idx_gr = left_part[1].find('Gr')
     idx_gr_2 = left_part[1].find('G r')
@@ -211,39 +250,9 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
         grupa = right_part[0][idx_gr_2:]
         left_part[0] = right_part[0][:idx_gr_2]
     if grupa == 'none':
-        warnings.append("Possible group required (Overlapped text)")
-    print(';------------------------------')
-    print(left_part)
-    print(right_part)
-    # The second argument is the teacher name
-    # Swapping needed for further processing
-    words = left_part[1].split()
-    filtered_left_part = [word for word in words if (len(word) >= 1) and (word != ' ')]
-
-    if len(filtered_left_part) == 2 and len(filtered_left_part[1]) == 1:
-        left_part[0], left_part[1] = left_part[1], left_part[0]
-    elif len(filtered_left_part) == 1 and re.match('[A-Z]+[a-z]+[A-Z]$', filtered_left_part[0]):
-        left_part[1] = left_part[1][:-1] + " " + left_part[1][-1]
-        left_part[0], left_part[1] = left_part[1], left_part[0]
+        warnings.append("WARN:Possible group required (Overlapped text)")
 
     return left_part + right_part, grupa
-
-
-def is_every_week_hour(day_cell_h, current_cell_height, grupa):
-    # print('day_cell_h', day_cell_h, 'current_cell_height', current_cell_height, 'grupa', grupa)
-    eps = 5
-    cell_third = day_cell_h / 3
-    cell_half = day_cell_h / 2
-    return ((cell_third - 2 * eps) < current_cell_height < (cell_third + eps)) or (
-            current_cell_height + eps >= day_cell_h) or (
-                   (current_cell_height + eps >= cell_half) and grupa.find('Gr') != -1)
-
-
-def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
-    # print('current_cell_y', current_cell_y, 'day_cell_y', day_cell_y, 'day_cell_h', day_cell_h)
-    eps = 5
-    day_cell_half_height = int(day_cell_h / 2)
-    return (current_cell_y + eps) >= day_cell_y + day_cell_half_height
 
 
 def extract_classes_data(page_path):
@@ -272,7 +281,7 @@ def extract_classes_data(page_path):
                 out = get_cell_string(cell_img)
                 words = out.splitlines()
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
-            print(filtered)
+            # print("FILTERED", filtered)
             current_hour_idx = extract_starting_hour(hours, x)
 
             if len(filtered) <= 1:
@@ -308,24 +317,22 @@ def extract_classes_data(page_path):
             if len(filtered) == 4:
                 filtered[1] += filtered[2]
                 filtered.pop(2)
+
             elif len(filtered) > 4:
                 # print("filtered before", filtered)
-                warnings.append("Extracted more words than anticipated. Verify if correct")
+                warnings.append("WARN:Extracted more words than anticipated.")
                 new_w = ""
                 while len(filtered) > 3:
                     if filtered[1].find('G') == -1:
                         new_w += filtered[1]
                         filtered.pop(1)
                 filtered[1] = new_w + filtered[1]
-                # print("filtered after", filtered)
 
             if len(filtered) == 3:
                 materie = filtered[1]
                 partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
-
                 if len(partitioning) >= 3:
                     if partitioning[0].find('G') != -1 or partitioning[0].find('SE'):
-                        print(partitioning)
                         grupa = ''.join(partitioning[:-1])
                         sala = partitioning[-1]
 
@@ -349,27 +356,56 @@ def extract_classes_data(page_path):
                 elif gr_in_first_2 != -1:
                     grupa = filtered[0][gr_in_first_2:]
                     filtered[0] = filtered[0].replace(grupa, '')
-                profesor = filtered[0]
-                words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
 
+                swap_prof_materie = False
+                if re.match('[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$', filtered[0]):
+                    profesor = filtered[0]
+                    profesor = add_space_to_teacher(profesor)
+                    print("space needed", filtered)
+                elif re.match('[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$', filtered[0]) or filtered[0].find(
+                        'indu') != -1:
+                    profesor = filtered[0]
+                    print("No change, no space", filtered)
+                else:
+                    materie = filtered[0]
+                    swap_prof_materie = True
+                    print("space not needed, change needed", filtered)
+
+                words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
+                # print('materie', materie, 'profesor', profesor)
                 # classroom and class are read
                 if len(words) > 1:
                     sala = words[-1]
-                    materie = ''.join(words[:-1])
+                    if swap_prof_materie:
+                        profesor = ''.join(words[:-1])
+                        profesor = add_space_to_teacher(profesor)
+                    else:
+                        materie = ''.join(words[:-1])
                 # classroom is not detected ( it is a single digit, so it needs psm-10 )
                 elif len(words) == 1:
                     cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
                     sala = get_cell_string(cell_img, "psm-10")
-                    materie = words[0]
+                    if swap_prof_materie:
+                        profesor = words[0]
+                    else:
+                        materie = words[0]
                 else:
                     warnings.append("No received data")
 
+            # Case of 1/3 or 1/4 cells that dont have a group.
+            # Isolating cell part of group.
+            if 70 < h < 100 and grupa == 'none':
+                cell_img = img_classes_gray[y:y + int(h / 2), x + int((2.4 * w) / 3):x + w]
+                grupa = get_cell_string(cell_img)
+                # print_img(cell_img)
+            # print(grupa)
             grupa, grupa_processed, sala = classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y)
+            # print(grupa, grupa_processed)
 
             temp = re.findall(r'\d+', profesor)
             res = list(map(int, temp))
             if len(res) or profesor == '':
-                warnings.append("No teacher found")
+                warnings.append("ERROR:No teacher found")
                 profesor += ' - none'
 
             # calculate day
@@ -377,12 +413,8 @@ def extract_classes_data(page_path):
 
             # Calculating if hour its weekly or once a odd/even week
             _, day_cell_y, _, day_cell_h = days[current_day]
-            if is_every_week_hour(day_cell_h, h, grupa):  # 1/2 cell that happens in every week
-                saptamana = "Impar / Par"
-            elif is_once_even_week_hour(y, day_cell_y, day_cell_h):
-                saptamana = "Par"
-            else:
-                saptamana = "Impar"
+            saptamana = get_week_type(day_cell_h, day_cell_y, grupa, h, y)
+
             grupa = grupa_processed
             profesor = profesor.replace('|', 'I')
             materie = materie.replace('|', 'l')
@@ -392,14 +424,27 @@ def extract_classes_data(page_path):
             ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                            hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                            grupa, filtered))
-            print('\n', ore[-1])
+            # print(ore[-1])
     return Pagina(page_title, warnings, ore)
+
+
+def get_week_type(day_cell_h, day_cell_y, grupa, h, y):
+    if is_every_week_hour(day_cell_h, h, grupa):  # 1/2 cell that happens in every week
+        saptamana = "Impar / Par"
+    elif is_once_even_week_hour(y, day_cell_y, day_cell_h):
+        saptamana = "Par"
+    else:
+        saptamana = "Impar"
+    return saptamana
 
 
 def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y):
     if sala == '':
         cell_img = img_classes_gray[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+        # cell_img = img_classes_gray[y + int((1.8 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+        # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
+        print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS", sala)
     if sala.find("Ha") != -1:
         sala = "Amf. Hater (Et. 0)"
     elif sala.find("St") != -1:

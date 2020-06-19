@@ -1,8 +1,8 @@
 {
     "titlu": "CTl Grupa 354",
     "warnings": [
-        "No teacher found",
-        "No teacher found"
+      "ERROR:No teacher found",
+      "ERROR:No teacher found"
     ],
     "ore": [
         {
