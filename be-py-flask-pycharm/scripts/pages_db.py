@@ -1,7 +1,8 @@
-from scripts import orar_ocr
 import sqlalchemy as db
 from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.orm import sessionmaker
+
+from scripts import orar_ocr
 
 
 def insert_page_title(session, orare, page):
@@ -71,5 +72,5 @@ def mysql_connection(pages):
         session.close()
 
 
-if __name__ == '__main__':
-    mysql_connection(orar_ocr.get_pages())
+def extract_pages(path):
+    mysql_connection(orar_ocr.get_pages(path))

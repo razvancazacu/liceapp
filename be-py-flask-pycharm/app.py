@@ -1,4 +1,8 @@
-from flask import Flask
+import threading
+import webbrowser
+from secrets import token_urlsafe
+
+from flask import Flask, redirect
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_restful import Api
@@ -7,7 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:rootalchemy@localhost/alchemydb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'mysecret'  # TODO: add security / login
+app.config['SECRET_KEY'] = token_urlsafe(16)
+URL = 'http://127.0.0.1:5000/'
+
 api = Api(app)
 admin = Admin(app, template_mode='bootstrap3')
 db = SQLAlchemy(app)
@@ -58,7 +64,7 @@ class WarningsModel(db.Model):
 
 
 class WarningsView(ModelView):
-    page_size = 50
+    page_size = 100
     column_searchable_list = ('orar.nume_orar', 'warning_details')
     column_filters = ('orar.nume_orar', 'warning_details')
 
@@ -67,8 +73,18 @@ admin.add_view(OrareView(OrareModel, db.session))
 admin.add_view(OreView(OreModel, db.session))
 admin.add_view(WarningsView(WarningsModel, db.session))
 
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', debug=True)
 
-    # app.run(host='127.0.0.1', debug=True, ssl_context=('cert.pem', 'key.pem'))
-    # app.run()
+@app.route('/')
+def index():
+    return redirect('/admin')
+
+
+def main(host='127.0.0.1', port='5000'):
+    print("Starting Flask Server")
+    URL = 'http://{0}:{1}/'.format(host, port)
+    threading.Timer(2, lambda: webbrowser.open(URL)).start()
+    app.run(host=host, port=port)
+
+
+if __name__ == '__main__':
+    main()

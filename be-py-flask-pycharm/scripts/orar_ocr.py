@@ -17,8 +17,27 @@ TEACHER_REGEX = '[A-Z]*[a-z]+[\s]{0,2}[A-Za-z]{1,2}[\s]*$'
 TEACHER_REGEX_NO_SPACE = '[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$'
 
 
+def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_AREA):
+    dim = None
+    (h, w) = image.shape[:2]
+
+    if width is None and height is None:
+        return image
+    if width is None:
+        r = height / float(h)
+        dim = (int(w * r), height)
+    else:
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    return cv2.resize(image, dim, interpolation=inter)
+
+
 def print_img(img):
-    cv2.imshow('img', img)
+    if img.shape[0] > 1500 or img.shape[1] > 1500:
+        img = resize_with_aspect_ratio(img, 1280, 720)
+    cv2.moveWindow('image', 200, 200)
+    cv2.imshow('window', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -61,18 +80,22 @@ def get_vh_lines_img(img):
     ver_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, kernel_len))
     #     Defining a horizontal kernel to detect all horizontal lines of image
     hor_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_len, 1))
-    #     A kernel of 2x2
+    #     A kernel of 2x2 - filtru
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     img_bin = get_binnary_img(img)
     #     Use vertical kernel to detect and save the vertical lines in a jpg
+    #     Removal of all things except elements masked by kernel, in this case, vertical lines
     image_1 = cv2.erode(img_bin, ver_kernel, iterations=3)
+
     vertical_lines = cv2.dilate(image_1, ver_kernel, iterations=3)
     cv2.imwrite("binary.jpg", img_bin)
     cv2.imwrite("vertical.jpg", vertical_lines)
     #     Use horizontal kernel to detect and save the horizontal lines in a jpg
     image_2 = cv2.erode(img_bin, hor_kernel, iterations=3)
+    # print_img(image_2)
     horizontal_lines = cv2.dilate(image_2, hor_kernel, iterations=3)
 
+    # print_img(horizontal_lines)
     cv2.imwrite("out_0_horizontal.jpg", horizontal_lines)
     #     Combine horizontal and vertical lines in a new third image, with both having same weight.
     img_vh = cv2.addWeighted(vertical_lines, 0.5, horizontal_lines, 1, 0.0)
@@ -82,7 +105,10 @@ def get_vh_lines_img(img):
     thresh, img_vh = cv2.threshold(img_vh, 128, 255, cv2.THRESH_BINARY)
 
     cv2.imwrite("horizontal.jpg", img_vh)
+    cv2.imwrite("img.jpg", img)
     bitxor = cv2.bitwise_xor(img, img_vh)
+    cv2.imwrite("bitxor.jpg", bitxor)
+
     bitnot = cv2.bitwise_not(bitxor)
     return img_vh, bitnot, img_bin
 
@@ -113,6 +139,7 @@ def get_table_cells(img, data_type):
 
 def load_images_from_folder(path):
     img_color = cv2.imread(path)
+
     if img_color is not None:
         page_title = get_page_title(img_color)
         img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
@@ -125,22 +152,18 @@ def load_images_from_folder(path):
         img_classes = get_cropped_classes_img(img)
         img_classes_col = get_cropped_classes_img(img_color)
         boxes_classes, gray_classes, bit_classes = get_table_cells(img_classes, 'classes')
+
     else:
         raise NameError("No image found at path: ", path)
+
     return page_title, boxes_days, boxes_hours, boxes_classes, gray_classes, img_classes_col, bit_classes
 
 
 def get_cell_string(cell_img, psm='psm-3'):
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 1))
-    border = cv2.copyMakeBorder(cell_img, 2, 2, 2, 2, cv2.BORDER_CONSTANT, value=[255, 255])
-    resizing = cv2.resize(border, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
-    dilation = cv2.dilate(resizing, kernel, iterations=1)
-    erosion = cv2.erode(dilation, kernel, iterations=2)
     if psm == 'psm-3':
         out = pytesseract.image_to_string(cell_img, config="--psm 3")
     else:
         out = pytesseract.image_to_string(cell_img, config="--psm 10")
-
     return out
 
 
@@ -230,6 +253,7 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
                                                  filtered_left_part[0] + filtered_left_part[1]) or (
             'indu' in left_part[1]):
         left_part[0], left_part[1] = left_part[1], left_part[0]
+
     elif (len(filtered_left_part) == 1 and re.match(TEACHER_REGEX_NO_SPACE, filtered_left_part[0])) or (
             'indu' in filtered_left_part[0]):
         left_part[1] = add_space_to_teacher(left_part[1])
@@ -252,7 +276,6 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
         elif idx_gr_2 != -1:
             grupa = right_part[0][idx_gr_2:]
             left_part[0] = right_part[0][:idx_gr_2]
-
     return left_part + right_part, grupa
 
 
@@ -263,14 +286,15 @@ def extract_classes_data(page_path):
         page_path)
     hours_starting_x = [hour[0] for hour in hours]
     warnings = []
+    # print(img_classes_col)
     for indx, cl in enumerate(classes):
         x, y, w, h = cl
+
         if x not in hours_starting_x:  # skipping wrong taken cells
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
 
         if np.mean(cell_img) <= 250:  # skipping white cells
-            # print_img(cell_img)
             grupa = 'none'
             materie = ''
             sala = ''
@@ -391,6 +415,7 @@ def extract_classes_data(page_path):
             # Case of 1/3 or 1/4 cells that dont have a group.
             # Isolating cell part of group.
             # print(grupa)
+            grupa = grupa.replace('|', '1')
             temp = re.findall(r'\d+', grupa)
             res = list(map(int, temp))
 
@@ -412,7 +437,6 @@ def extract_classes_data(page_path):
 
             # calculate day
             current_day = int(y / (days[-1][1] - days[-2][1]))
-
             # Calculating if hour its weekly or once a odd/even week
             _, day_cell_y, _, day_cell_h = days[current_day]
             saptamana = get_week_type(day_cell_h, day_cell_y, grupa, h, y)
@@ -423,6 +447,7 @@ def extract_classes_data(page_path):
             grupa = ''.join([i if ord(i) < 128 else '' for i in grupa])
             materie = ''.join([i if ord(i) < 128 else '' for i in materie])
             profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
+
             ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                            hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                            grupa, filtered))
@@ -446,6 +471,7 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         # cell_img = img_classes_gray[y + int((1.8 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
+    sala = sala.replace('|', '1')
     if "Ha" in sala:
         sala = "Amf. Hater (Et. 0)"
     elif "St" in sala:
@@ -454,10 +480,10 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         sala = "Amf. Pompeiu (Et. 2)"
     elif "Ti" in sala:
         sala = "Amf. Titeica (Et. 3)"
-    elif "Chim" in sala:
+    elif "Chim" in sala or 'him' in sala:
         sala = "Amf. R1 (Et. 1, Fac. Chimie)"
     elif sala == 'O':
-        sala = "Sala " + '0'
+        sala = "Sala " + '9'
     elif sala == 'Z' or sala == 'S':
         sala = "Sala " + '2'
     elif 'Fiz' not in sala:
@@ -504,23 +530,18 @@ class Pagina:
                           indent=4)
 
 
-num_cores = multiprocessing.cpu_count()
-
-
-def get_pages():
+def get_pages(img_folder_path):
     start = time.time()
 
     # with open('page.txt', 'w') as outfile:
-    folder = os.path.dirname(os.path.abspath('../tmp/300dpi_sem_2/pages'))
+
+    folder = os.path.dirname(os.path.abspath(img_folder_path))
     paths = []
     for filename in os.listdir(folder):
         paths.append(os.path.join(folder, filename))
-
-    pagini = Parallel(n_jobs=num_cores, backend='multiprocessing')(
+    num_cores = multiprocessing.cpu_count()
+    pages = Parallel(n_jobs=num_cores, backend='multiprocessing')(
         delayed(extract_classes_data)(path) for path in paths)
-    # for pag in pagini:
-    #     outfile.write(str(pag.titlu) + '\n')
-    #     for ora in pag.ore:
-    #         outfile.write(str(ora) + '\n')
+
     print(time.time() - start)
-    return pagini
+    return pages

@@ -6,6 +6,22 @@ from scripts.orar_ocr import *
 class TestPageReading(unittest.TestCase):
     maxDiff = None
 
+    # def test_page0_dpi400to300(self):
+    #     test_dir_path = 'resources_img/'
+    #     start = time.time()
+    #
+    #     page1 = extract_classes_data(test_dir_path + '300dpi.jpg')
+    #     flag2 = time.time() - start
+    #     print(flag2)
+    #     start = time.time()
+    #     page1 = extract_classes_data(test_dir_path + '400dpi.jpg')
+    #     flag2 = time.time() - start
+    #     print(flag2)
+    #     page2 = extract_classes_data(test_dir_path + '500dpi.jpg')
+    #     flag = time.time() - start
+    #     print(flag)
+    #     start = time.time()
+
     def test_page16(self):
         test_dir_path = 'resources_img/'
         page = extract_classes_data(test_dir_path + 'out_16.jpg')
