@@ -4,7 +4,7 @@ from multiprocessing import Process
 from os import listdir, getcwd
 from os.path import isfile, join, abspath
 
-import app
+import flask_server
 from scripts.orar_convert_pdf_to_image import convert_pdf_to_images
 from scripts.orar_download import get_fmi_pdf
 from scripts.pages_db import extract_pages
@@ -17,7 +17,7 @@ class MainControl:
         self.port = port
         self.current_pdf = current_pdf
         self.pdf_option = pdf_option
-        self.server_process = Process(target=app.main, args=(self.host, self.port))
+        self.server_process = Process(target=flask_server.main, args=(self.host, self.port))
         self.server_status = "Offline"
         self.thread_time_sleep = threading.Timer(3.0, self.auto_extract_on_timer)
         self.start_time = time.time()
@@ -99,7 +99,6 @@ class MainControl:
             self.thread_time_sleep = threading.Timer(18000.0, self.auto_extract_on_timer)
             self.start_time = time.time()
             self.thread_time_sleep.start()
-
         else:
             print("Timer already set.",
                   "Next data extraction: %s minutes" % ((18000.0 - (time.time() - self.start_time)) / 60))

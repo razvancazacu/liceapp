@@ -88,15 +88,15 @@ def get_vh_lines_img(img):
     image_1 = cv2.erode(img_bin, ver_kernel, iterations=3)
 
     vertical_lines = cv2.dilate(image_1, ver_kernel, iterations=3)
-    cv2.imwrite("binary.jpg", img_bin)
-    cv2.imwrite("vertical.jpg", vertical_lines)
+    cv2.imwrite("extracted/binary.jpg", img_bin)
+    cv2.imwrite("extracted/vertical.jpg", vertical_lines)
     #     Use horizontal kernel to detect and save the horizontal lines in a jpg
     image_2 = cv2.erode(img_bin, hor_kernel, iterations=3)
     # print_img(image_2)
     horizontal_lines = cv2.dilate(image_2, hor_kernel, iterations=3)
 
     # print_img(horizontal_lines)
-    cv2.imwrite("out_0_horizontal.jpg", horizontal_lines)
+    cv2.imwrite("extracted/horizontal.jpg", horizontal_lines)
     #     Combine horizontal and vertical lines in a new third image, with both having same weight.
     img_vh = cv2.addWeighted(vertical_lines, 0.5, horizontal_lines, 1, 0.0)
     #     Eroding and thesholding the image
@@ -104,11 +104,10 @@ def get_vh_lines_img(img):
     img_vh = cv2.erode(~img_vh, kernel, iterations=2)
     thresh, img_vh = cv2.threshold(img_vh, 128, 255, cv2.THRESH_BINARY)
 
-    cv2.imwrite("horizontal.jpg", img_vh)
-    cv2.imwrite("img.jpg", img)
+    cv2.imwrite("extracted/vh.jpg", img_vh)
+    cv2.imwrite("extracted/base.jpg", img)
     bitxor = cv2.bitwise_xor(img, img_vh)
-    cv2.imwrite("bitxor.jpg", bitxor)
-
+    cv2.imwrite("extracted/bitxor.jpg", bitxor)
     bitnot = cv2.bitwise_not(bitxor)
     return img_vh, bitnot, img_bin
 
