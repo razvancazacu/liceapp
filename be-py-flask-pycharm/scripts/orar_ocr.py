@@ -544,10 +544,19 @@ class Pagina:
 
 
 def get_pages(img_folder_path):
+    pages = extract_pages_data(img_folder_path)
+    return pages
+
+
+def write_pages_to_json_file(img_folder_path):
+    pages = extract_pages_data(img_folder_path)
+    with open('extracted/Pages_to_JSON.json', 'w') as outfile:
+        outfile.write(json.dumps(pages, default=Pagina.to_json))
+        # json.loads
+
+
+def extract_pages_data(img_folder_path):
     start = time.time()
-
-    # with open('page.txt', 'w') as outfile:
-
     folder = os.path.dirname(os.path.abspath(img_folder_path))
     paths = []
     for filename in os.listdir(folder):
@@ -555,6 +564,5 @@ def get_pages(img_folder_path):
     num_cores = multiprocessing.cpu_count()
     pages = Parallel(n_jobs=num_cores, backend='multiprocessing')(
         delayed(extract_classes_data)(path) for path in paths)
-
     print(time.time() - start)
     return pages

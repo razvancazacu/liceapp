@@ -36,11 +36,14 @@ if __name__ == '__main__':
     myButtonExtractImages = Button(
         root, text="(6)Extract Images From The Selected PDF", width=30, height=3,
         command=lambda: Controller.convert_pdf_to_img())
+    myButtonWriteToJson = Button(
+        root, text="(7)Extract Data To JSON", width=30, height=3,
+        command=lambda: Controller.write_schedule_toJSON())
     myButtonCloseServer = Button(
-        root, text="(7)Close Server", width=30, height=3,
+        root, text="(8)Close Server", width=30, height=3,
         command=lambda: Controller.close_server())
     myButtonCloseGUI = Button(
-        root, text="(8)EXIT", width=30, height=3,
+        root, text="(9)EXIT", width=30, height=3,
         command=lambda: exit_gui())
 
     dropSelectedPDF = OptionMenu(
@@ -57,8 +60,9 @@ if __name__ == '__main__':
     dropSelectedDownloadOption.grid(row=5, column=1, sticky="ew")
     myButtonExtractImages.grid(row=6, sticky="ew")
     dropSelectedPDF.grid(row=6, column=1, sticky="ew")
-    myButtonCloseServer.grid(row=7, sticky="ew")
-    myButtonCloseGUI.grid(row=8, sticky="ew")
+    myButtonWriteToJson.grid(row=7, sticky="ew")
+    myButtonCloseServer.grid(row=8, sticky="ew")
+    myButtonCloseGUI.grid(row=9, sticky="ew")
 
 
     def exit_gui():

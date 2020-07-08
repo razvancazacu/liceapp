@@ -111,3 +111,14 @@ class MainControl:
                     (18000.0 - (time.time() - self.start_time)) / 60))
         else:
             print("Automatic data extraction already offline")
+
+    def write_schedule_toJSON(self):
+        print("Started JSON Conversion")
+        path = 'resources/Images/'
+        if len(listdir(path)) == 0:
+            print("No files found in the images directory.")
+        else:
+            path += 'Pages'
+            from scripts.orar_ocr import write_pages_to_json_file
+            write_pages_to_json_file(path)
+        print("Ended Conversion to JSON")
