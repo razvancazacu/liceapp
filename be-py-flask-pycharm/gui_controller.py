@@ -5,9 +5,9 @@ from os import listdir, getcwd
 from os.path import isfile, join, abspath
 
 import flask_server
+from scripts.db_controller import extract_pages
 from scripts.orar_convert_pdf_to_image import convert_pdf_to_images
 from scripts.orar_download import get_fmi_pdf
-from scripts.pages_db import extract_pages
 
 
 class MainControl:

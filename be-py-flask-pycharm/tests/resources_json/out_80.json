@@ -3,110 +3,116 @@
     "warnings": [],
     "ore": [
         {
-            "zi": "Marti",
-            "ora_inceput": "18:00",
-            "ora_final": "20:00",
-            "profesor": "Ichim B / Paduraru C",
-            "materie": "Big Data",
-            "sala": "Amf. Hater (Et. 0)",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Ichim B / Paduraru C",
-                "Big Data",
-                "O(Haret)"
-            ]
+          "zi": "Marti",
+          "ora_inceput": "18:00",
+          "ora_final": "20:00",
+          "profesor": "Ichim B / Paduraru C",
+          "materie": "BigData",
+          "sala": "Amf. Hater (Et. 0)",
+          "grupa": "none",
+          "saptamana": "Impar / Par",
+          "date": [
+            "Ichim B / Paduraru C",
+            "Big Data",
+            "O(Haret)"
+          ]
         },
-        {
-            "zi": "Marti",
-            "ora_inceput": "8:00",
-            "ora_final": "10:00",
-            "profesor": "Alexe B",
-            "materie": "AdvMachLearn ",
-            "sala": "Sala 3",
-            "grupa": "Grupa:3",
-            "saptamana": "Impar",
-            "date": [
-                "Alexe B",
-                "AdvMachLearn ",
-                "3"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "8:00",
-            "ora_final": "10:00",
-            "profesor": "Alexe B",
-            "materie": "AdvMachLearn ",
-            "sala": "Sala 3",
-            "grupa": "Grupa:4",
-            "saptamana": "Par",
-            "date": [
-                "Alexe B",
-                "AdvMachLearn ",
-                "3"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "16:00",
-            "ora_final": "18:00",
-            "profesor": "Ichim B / Paduraru C",
-            "materie": "Big Data ",
-            "sala": "Sala L-204",
-            "grupa": "Grupa:1",
-            "saptamana": "Impar",
-            "date": [
-                "Ichim B / Paduraru C",
-                "Big Data ",
-                "L-204"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "18:00",
-            "ora_final": "20:00",
-            "profesor": "Ichim B / Paduraru C",
-            "materie": "Big Data ",
-            "sala": "Sala L-204",
-            "grupa": "Grupa:2",
-            "saptamana": "Impar",
-            "date": [
-                "Ichim B / Paduraru C",
-                "Big Data ",
-                "L-204"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "16:00",
-            "ora_final": "18:00",
-            "profesor": "Ichim B / Paduraru C",
-            "materie": "Big Data ",
-            "sala": "Sala L-204",
-            "grupa": "Grupa:3",
-            "saptamana": "Par",
-            "date": [
-                "Ichim B / Paduraru C",
-                "Big Data ",
-                "L-204"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "18:00",
-            "ora_final": "20:00",
-            "profesor": "Ichim B / Paduraru C",
-            "materie": "Big Data ",
-            "sala": "Sala L-204",
-            "grupa": "Grupa:4",
-            "saptamana": "Par",
-            "date": [
-                "Ichim B / Paduraru C",
-                "Big Data ",
-                "L-204"
-            ]
-        },
+      {
+        "zi": "Marti",
+        "ora_inceput": "8:00",
+        "ora_final": "10:00",
+        "profesor": "Alexe B",
+        "materie": "AdvMachLearn",
+        "sala": "Sala 3",
+        "grupa": "Grupa:3",
+        "saptamana": "Impar",
+        "date": [
+          "Alexe B",
+          "AdvMachLearn ",
+          "3",
+          "Gr.3"
+        ]
+      },
+      {
+        "zi": "Marti",
+        "ora_inceput": "8:00",
+        "ora_final": "10:00",
+        "profesor": "Alexe B",
+        "materie": "AdvMachLearn",
+        "sala": "Sala 3",
+        "grupa": "Grupa:4",
+        "saptamana": "Par",
+        "date": [
+          "Alexe B",
+          "AdvMachLearn ",
+          "3",
+          "G r.4"
+        ]
+      },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "16:00",
+        "ora_final": "18:00",
+        "profesor": "Ichim B / Paduraru C",
+        "materie": "BigData",
+        "sala": "Sala L-204",
+        "grupa": "Grupa:1",
+        "saptamana": "Impar",
+        "date": [
+          "Ichim B / Paduraru C",
+          "Big Data ",
+          "L-204",
+          "Gr.1"
+        ]
+      },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "18:00",
+        "ora_final": "20:00",
+        "profesor": "Ichim B / Paduraru C",
+        "materie": "BigData",
+        "sala": "Sala L-204",
+        "grupa": "Grupa:2",
+        "saptamana": "Impar",
+        "date": [
+          "Ichim B / Paduraru C",
+          "Big Data ",
+          "L-204",
+          "Gr.2"
+        ]
+      },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "16:00",
+        "ora_final": "18:00",
+        "profesor": "Ichim B / Paduraru C",
+        "materie": "BigData",
+        "sala": "Sala L-204",
+        "grupa": "Grupa:3",
+        "saptamana": "Par",
+        "date": [
+          "Ichim B / Paduraru C",
+          "Big Data ",
+          "L-204",
+          "Gr.3"
+        ]
+      },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "18:00",
+        "ora_final": "20:00",
+        "profesor": "Ichim B / Paduraru C",
+        "materie": "BigData",
+        "sala": "Sala L-204",
+        "grupa": "Grupa:4",
+        "saptamana": "Par",
+        "date": [
+          "Ichim B / Paduraru C",
+          "Big Data ",
+          "L-204",
+          "Gr.4"
+        ]
+      },
         {
             "zi": "Joi",
             "ora_inceput": "8:00",
@@ -132,8 +138,8 @@
             "grupa": "Grupa:1",
             "saptamana": "Impar",
             "date": [
-                "Cidota M ",
-                "StatDataSci L-309"
+              "Cidota M Gr_1",
+              "StatDataSci L-309"
             ]
         },
         {
@@ -146,8 +152,8 @@
             "grupa": "Grupa:2",
             "saptamana": "Par",
             "date": [
-                "Cidota M ",
-                "StatDataSci L-309"
+              "Cidota M Gr_2",
+              "StatDataSci L-309"
             ]
         },
         {
@@ -165,35 +171,37 @@
                 "1(Stoilow)"
             ]
         },
-        {
-            "zi": "Vineri",
-            "ora_inceput": "10:00",
-            "ora_final": "12:00",
-            "profesor": "Alexe B",
-            "materie": "AdvMachLearn ",
-            "sala": "Sala 3",
-            "grupa": "Grupa:1",
-            "saptamana": "Impar",
-            "date": [
-                "Alexe B",
-                "AdvMachLearn ",
-                "3"
-            ]
-        },
-        {
-            "zi": "Vineri",
-            "ora_inceput": "10:00",
-            "ora_final": "12:00",
-            "profesor": "Alexe B",
-            "materie": "AdvMachLearn ",
-            "sala": "Sala 3",
-            "grupa": "Grupa:2",
-            "saptamana": "Par",
-            "date": [
-                "Alexe B",
-                "AdvMachLearn ",
-                "3"
-            ]
-        }
+      {
+        "zi": "Vineri",
+        "ora_inceput": "10:00",
+        "ora_final": "12:00",
+        "profesor": "Alexe B",
+        "materie": "AdvMachLearn",
+        "sala": "Sala 3",
+        "grupa": "Grupa:1",
+        "saptamana": "Impar",
+        "date": [
+          "Alexe B",
+          "AdvMachLearn ",
+          "3",
+          "Gr. 1"
+        ]
+      },
+      {
+        "zi": "Vineri",
+        "ora_inceput": "10:00",
+        "ora_final": "12:00",
+        "profesor": "Alexe B",
+        "materie": "AdvMachLearn",
+        "sala": "Sala 3",
+        "grupa": "Grupa:2",
+        "saptamana": "Par",
+        "date": [
+          "Alexe B",
+          "AdvMachLearn ",
+          "3",
+          "Gr.2"
+        ]
+      }
     ]
 }

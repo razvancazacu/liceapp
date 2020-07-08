@@ -18,9 +18,7 @@ TEACHER_REGEX_NO_SPACE = '[A-Z]*[a-z]+[\s]{0}[A-Za-z]{1,2}[\s]*$'
 
 
 def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_AREA):
-    dim = None
     (h, w) = image.shape[:2]
-
     if width is None and height is None:
         return image
     if width is None:
@@ -202,19 +200,19 @@ class Ora:
 
 def is_every_week_hour(day_cell_h, current_cell_height, grupa):
     # print('day_cell_h', day_cell_h, 'current_cell_height', current_cell_height, 'grupa', grupa)
-    eps = 5
+    # eps = 5
     cell_third = day_cell_h / 3
     cell_half = day_cell_h / 2
-    return ((cell_third - 2 * eps) < current_cell_height < (cell_third + eps)) or (
-            current_cell_height + eps >= day_cell_h) or (
-            (current_cell_height + eps >= cell_half) and ('Gr' in grupa))
+    return ((cell_third - 2 * 5) < current_cell_height < (cell_third + 5)) or (
+            current_cell_height + 5 >= day_cell_h) or (
+                   (current_cell_height + 5 >= cell_half) and ('Gr' in grupa))
 
 
 def is_once_even_week_hour(current_cell_y, day_cell_y, day_cell_h):
     # print('current_cell_y', current_cell_y, 'day_cell_y', day_cell_y, 'day_cell_h', day_cell_h)
-    eps = 5
+    # eps = 5
     day_cell_half_height = int(day_cell_h / 2)
-    return (current_cell_y + eps) >= day_cell_y + day_cell_half_height
+    return (current_cell_y + 5) >= day_cell_y + day_cell_half_height
 
 
 def add_space_to_teacher(teacher_string):
@@ -226,26 +224,26 @@ def add_space_to_teacher(teacher_string):
     return teacher_string
 
 
-def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
+def get_small_cell_values(grupa, img_classes_col, x, y, w, h):
     # left part
     cell_img = img_classes_col[y:y + h, x:x + int((1.9 * w) / 3)]
+    # print_img(cell_img)
+
     left_part = get_cell_string(cell_img)
-    left_part = left_part.splitlines()
-    filtered_part = [word for word in left_part if len(word) > 4]
-    left_part = filtered_part
+    left_part = [word for word in left_part.splitlines() if len(word) > 1]
+    # print(left_part)
+
     # right part
     cell_img = img_classes_col[y:y + h, x + int((2.3 * w) / 3):x + w]
     right_part = get_cell_string(cell_img)
-    if len(right_part) == 0:
+
+    if len(right_part) == 0:  # No classroom received
         right_part = get_cell_string(cell_img, psm="psm-10")
-    right_part = right_part.splitlines()
-    filtered_part = [word for word in right_part if (len(word) >= 1) and (word != ' ')]
-    right_part = filtered_part
+    right_part = [word for word in right_part.splitlines() if (len(word) >= 1) and (word != ' ')]
 
     # The second argument is the teacher name
     # Swapping needed for further processing
-    words = left_part[1].split()
-    filtered_left_part = [word for word in words if (len(word) >= 1) and (word != ' ')]
+    filtered_left_part = [word for word in left_part[1].split() if (len(word) >= 1) and (word != ' ')]
     # print(filtered_left_part)
 
     if len(filtered_left_part) >= 2 and re.match(TEACHER_REGEX,
@@ -257,33 +255,42 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings):
             'indu' in filtered_left_part[0]):
         left_part[1] = add_space_to_teacher(left_part[1])
         left_part[0], left_part[1] = left_part[1], left_part[0]
+    # print(left_part)
 
-    idx_gr = left_part[1].find('Gr')
-    idx_gr_2 = left_part[1].find('G r')
-    if idx_gr != -1:
-        grupa = left_part[1][idx_gr:]
-        left_part[1] = left_part[1][:idx_gr]
-    elif idx_gr_2 != -1:
-        grupa = left_part[1][idx_gr_2:]
-        left_part[1] = left_part[1][:idx_gr_2]
-    else:
-        idx_gr = right_part[0].find('Gr')
-        idx_gr_2 = right_part[0].find('G r')
-        if idx_gr != -1:
-            grupa = right_part[0][idx_gr:]
-            right_part[0] = right_part[0][:idx_gr]
-        elif idx_gr_2 != -1:
-            grupa = right_part[0][idx_gr_2:]
-            left_part[0] = right_part[0][:idx_gr_2]
+    grupa = extract_group(grupa, right_part)
+    if grupa == "none":
+        grupa = extract_group(grupa, left_part)
+        if grupa == "none" and left_part[-1][-1].isdigit():
+            grupa = left_part[-1][-1]
+            left_part[-1] = left_part[-1][:-1:]
     return left_part + right_part, grupa
+
+
+def has_numbers(input_string):
+    return any(char.isdigit() for char in input_string)
+
+
+def extract_group(grupa, words):
+    for idx, word in enumerate(words):
+        idx_gr = word.lower().rfind('gr')
+        idx_gr_2 = word.lower().rfind('g r')
+        if idx_gr != -1 and has_numbers(word[idx_gr:]):
+            grupa = words[idx][idx_gr:]
+            words[idx] = words[idx][:idx_gr]
+            break
+        elif idx_gr_2 != -1 and has_numbers(word[idx_gr_2:]):
+            grupa = words[idx][idx_gr_2:]
+            words[idx] = words[idx][:idx_gr_2]
+            break
+    return grupa
 
 
 def extract_classes_data(page_path):
     print("started work on file from path:", page_path)
-    ore = []
     page_title, days, hours, classes, img_classes_gray, img_classes_col, img_classes_bit = load_images_from_folder(
         page_path)
     hours_starting_x = [hour[0] for hour in hours]
+    ore = []
     warnings = []
     # print(img_classes_col)
     for indx, cl in enumerate(classes):
@@ -292,18 +299,20 @@ def extract_classes_data(page_path):
         if x not in hours_starting_x:  # skipping wrong taken cells
             continue
         cell_img = img_classes_col[y:y + h, x:x + w]  # full size cell
-
         if np.mean(cell_img) <= 250:  # skipping white cells
+            # print_img(cell_img)
             grupa = 'none'
             materie = ''
             sala = ''
 
-            if h < 65:  # for 1/8 cells and 1/6
-                filtered, grupa = get_small_cell_values(grupa, img_classes_col, x, y, w, h, warnings)
+            if h < 65:  # process cells that are  1/8  and 1/6 of full size
+                filtered, grupa = get_small_cell_values(grupa, img_classes_col, x, y, w, h)
+                extracted_data = (filtered + [grupa]).copy()
             else:
                 out = get_cell_string(cell_img)
                 words = out.splitlines()
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
+                extracted_data = filtered.copy()
             # print("FILTERED", filtered)
             current_hour_idx = extract_starting_hour(hours, x)
 
@@ -317,19 +326,19 @@ def extract_classes_data(page_path):
                     words += out.splitlines()
 
                 filtered = [word for word in words if (len(word) >= 1) and (word != ' ')]
-
+            # print(filtered)
             if len(filtered) <= 1:
                 warnings.append("Cell " + str(indx) + "Unsuccessful retry. ")
                 ore.append(Ora(day_string[0], hour_string[current_hour_idx],
                                hour_string[current_hour_idx + round((w / 260))], 'none', 'none', 'none', 'none',
-                               'none', []))
+                               'none', extracted_data))
                 continue
 
             # Case when cell has on the same row the teacher name and the group
-            gr_idx = filtered[0].find('Gr')
-            if gr_idx != -1:
-                grupa = filtered[0][gr_idx:]
-                profesor = filtered[0][:gr_idx]
+            idx_gr = filtered[0].lower().rfind('gr')
+            if idx_gr != -1 and has_numbers(filtered[idx_gr:]):
+                grupa = filtered[0][idx_gr:]
+                profesor = filtered[0][:idx_gr]
             else:
                 profesor = filtered[0]
 
@@ -368,14 +377,7 @@ def extract_classes_data(page_path):
                     else:
                         sala = ''.join(partitioning)
             elif size_of_filtered == 2:
-                gr_in_first = filtered[0].find('Gr')
-                gr_in_first_2 = filtered[0].find('G r')
-                if gr_in_first != -1:
-                    grupa = filtered[0][gr_in_first:]
-                    filtered[0] = filtered[0].replace(grupa, '')
-                elif gr_in_first_2 != -1:
-                    grupa = filtered[0][gr_in_first_2:]
-                    filtered[0] = filtered[0].replace(grupa, '')
+                grupa = extract_group(grupa, filtered)
 
                 swap_prof_materie = False
                 if re.match(TEACHER_REGEX_NO_SPACE, filtered[0]):
@@ -394,12 +396,16 @@ def extract_classes_data(page_path):
                 # print('materie', materie, 'profesor', profesor)
                 # classroom and class are read
                 if len(words) > 1:
-                    sala = words[-1]
+                    # sala = words[-1]
+                    for idx, word in enumerate(words):
+                        if has_numbers(word):
+                            sala = word
+                            words.pop(idx)
                     if swap_prof_materie:
-                        profesor = ''.join(words[:-1])
+                        profesor = ''.join(words[:])
                         profesor = add_space_to_teacher(profesor)
                     else:
-                        materie = ''.join(words[:-1])
+                        materie = ''.join(words[:])
                 # classroom is not detected ( it is a single digit, so it needs psm-10 )
                 elif len(words) == 1:
                     cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
@@ -421,9 +427,7 @@ def extract_classes_data(page_path):
             if 50 < h < 100 and len(res) == 0:
                 cell_img = img_classes_gray[y:y + int(h / 2), x + int((2.4 * w) / 3):x + w]
                 grupa = get_cell_string(cell_img)
-                # print_img(cell_img)
-                # print(grupa)
-            # print(grupa)
+
             grupa, grupa_processed, sala = classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y,
                                                                          warnings)
             # print(grupa, grupa_processed)
@@ -442,14 +446,15 @@ def extract_classes_data(page_path):
 
             grupa = grupa_processed
             profesor = profesor.replace('|', 'I')
-            materie = materie.replace('|', 'l')
+            materie = materie.replace('|', 'l').replace(' ', '')
             grupa = ''.join([i if ord(i) < 128 else '' for i in grupa])
             materie = ''.join([i if ord(i) < 128 else '' for i in materie])
             profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
-
+            if 'gulici' in profesor:
+                profesor = "Dragulici D"
             ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                            hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
-                           grupa, filtered))
+                           grupa, extracted_data))
             # print(ore[-1])
     return Pagina(page_title, warnings, ore)
 
@@ -465,8 +470,8 @@ def get_week_type(day_cell_h, day_cell_y, grupa, h, y):
 
 
 def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, warnings):
+    cell_img = img_classes_gray[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
     if sala == '':
-        cell_img = img_classes_gray[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # cell_img = img_classes_gray[y + int((1.8 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
@@ -485,8 +490,17 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         sala = "Sala " + '9'
     elif sala == 'Z' or sala == 'S':
         sala = "Sala " + '2'
-    elif 'Fiz' not in sala:
+    elif any(x in sala for x in ['V2', 'W']):
+        sala = "Sala " + '12'
+    elif any(x in sala for x in ['zie', 'Zag', 'Ze']):
+        sala = "Sala " + '219'
+    elif any(x in sala for x in ['Mag', 'Fiz', 'ica']):
+        sala = "Fac.Fizica -Magurele"
+    elif not has_numbers(sala):
+        sala = "Sala " + get_cell_string(cell_img, psm="psm-3")
+    else:
         sala = "Sala " + sala
+
     temp = re.findall(r'\d+', grupa)
     res = list(map(int, temp))
 
@@ -520,7 +534,7 @@ def extract_starting_hour(hours, x):
 
 class Pagina:
     def __init__(self, titlu, warnings, ore):
-        self.titlu = titlu
+        self.titlu = titlu.replace('|', '1')
         self.warnings = warnings
         self.ore = ore
 

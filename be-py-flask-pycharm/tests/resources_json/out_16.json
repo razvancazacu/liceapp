@@ -100,9 +100,10 @@
             "grupa": "none",
             "saptamana": "Impar / Par",
             "date": [
-                "Dragan M",
-                "ProiectareAsistDeCalGC",
-                "L-204"
+              "Dragan M",
+              "ProiectareAsistDeCal",
+              "GC",
+              "L-204"
             ]
         },
         {
@@ -115,8 +116,8 @@
             "grupa": "Grupa:1",
             "saptamana": "Impar",
             "date": [
-                "Pascan R ",
-                "CalculNumeric L.218"
+              "Pascan R Gr 1",
+              "CalculNumeric L.218"
             ]
         },
         {
@@ -129,40 +130,40 @@
             "grupa": "Grupa:2",
             "saptamana": "Par",
             "date": [
-                "Pascan R ",
-                "CalculNumeric L.218"
+              "Pascan R Gr2",
+              "CalculNumeric L.218"
             ]
         },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "8:00",
-            "ora_final": "12:00",
-            "profesor": "Iftimie S / Tazlaoanu C",
-            "materie": "BazeElectroteh",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar",
-            "date": [
-                "Iftimie S / Tazlaoanu C",
-                "BazeElectroteh",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "13:00",
-            "ora_final": "15:00",
-            "profesor": "Tazlaoanu C",
-            "materie": "BazeElectroteh",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Tazlaoanu C",
-                "BazeElectroteh",
-                "Fac.Fizica -Magurele"
-            ]
-        },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "8:00",
+        "ora_final": "12:00",
+        "profesor": "Iftimie S / Tazlaoanu C",
+        "materie": "BazeElectroteh",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar",
+        "date": [
+          "Iftimie S / Tazlaoanu C",
+          "BazeElectroteh",
+          "Fac.Fizica -Magurele"
+        ]
+      },
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "13:00",
+        "ora_final": "15:00",
+        "profesor": "Tazlaoanu C",
+        "materie": "BazeElectroteh",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
+          "Tazlaoanu C",
+          "BazeElectroteh",
+          "Fac.Fizica -Magurele"
+        ]
+      },
         {
             "zi": "Joi",
             "ora_inceput": "10:00",
@@ -188,9 +189,10 @@
             "grupa": "none",
             "saptamana": "Impar / Par",
             "date": [
-                "Dragan M",
-                "ProiectareAsistDeCalc",
-                "3(Titeica)"
+              "Dragan M",
+              "ProiectareAsistDeCal",
+              "c",
+              "3(Titeica)"
             ]
         },
         {

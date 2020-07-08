@@ -34,66 +34,66 @@
                 "GraficaPeCalc"
             ]
         },
-        {
-            "zi": "Marti",
-            "ora_inceput": "12:00",
-            "ora_final": "14:00",
-            "profesor": "lon L",
-            "materie": "ArhitSistPar",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "lon L",
-                "ArhitSistPar",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "14:00",
-            "ora_final": "16:00",
-            "profesor": "Radu A",
-            "materie": "SistCuMicroproc",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Radu A",
-                "SistCuMicroproc",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "16:00",
-            "ora_final": "18:00",
-            "profesor": "354 - none",
-            "materie": "SistCuMicroproc",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "354",
-                "SistCuMicroproc",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "18:00",
-            "ora_final": "20:00",
-            "profesor": "354 - none",
-            "materie": "ArhitSistPar",
-            "sala": "Fac.Fizica-Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "354",
-                "ArhitSistPar",
-                "Fac.Fizica -Magurele"
-            ]
-        },
+      {
+        "zi": "Marti",
+        "ora_inceput": "12:00",
+        "ora_final": "14:00",
+        "profesor": "lon L",
+        "materie": "ArhitSistPar",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
+          "lon L",
+          "ArhitSistPar",
+          "Fac.Fizica -Magurele"
+        ]
+      },
+      {
+        "zi": "Marti",
+        "ora_inceput": "14:00",
+        "ora_final": "16:00",
+        "profesor": "Radu A",
+        "materie": "SistCuMicroproc",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
+          "Radu A",
+          "SistCuMicroproc",
+          "Fac.Fizica -Magurele"
+        ]
+      },
+      {
+        "zi": "Marti",
+        "ora_inceput": "16:00",
+        "ora_final": "18:00",
+        "profesor": "354 - none",
+        "materie": "SistCuMicroproc",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
+          "354",
+          "SistCuMicroproc",
+          "Fac.Fizica -Magurele"
+        ]
+      },
+      {
+        "zi": "Marti",
+        "ora_inceput": "18:00",
+        "ora_final": "20:00",
+        "profesor": "354 - none",
+        "materie": "ArhitSistPar",
+        "sala": "Fac.Fizica -Magurele",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
+          "354",
+          "ArhitSistPar",
+          "Fac.Fizica -Magurele"
+        ]
+      },
         {
             "zi": "Miercuri",
             "ora_inceput": "8:00",
