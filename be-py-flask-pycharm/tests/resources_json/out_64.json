@@ -24,15 +24,15 @@
             "zi": "Luni",
             "ora_inceput": "12:00",
             "ora_final": "14:00",
-            "profesor": "Diaconu Al",
-            "materie": "GraficaPeCalc",
-            "sala": "Sala 8",
-            "grupa": "none",
-            "saptamana": "Par",
-            "date": [
-                "Diaconu Al",
-                "GraficaPeCalc"
-            ]
+          "profesor": "Diaconu Al",
+          "materie": "GraficaPeCalc",
+          "sala": "Sala 8",
+          "grupa": "none",
+          "saptamana": "Par",
+          "date": [
+            "Diaconu Al",
+            "GraficaPeCalc"
+          ]
         },
       {
         "zi": "Marti",
@@ -94,16 +94,16 @@
           "Fac.Fizica -Magurele"
         ]
       },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "8:00",
-            "ora_final": "10:00",
-            "profesor": "Mincu R",
-            "materie": "GraficaPeCalc",
-            "sala": "Sala L-308",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
+      {
+        "zi": "Miercuri",
+        "ora_inceput": "8:00",
+        "ora_final": "10:00",
+        "profesor": "Mincu R",
+        "materie": "GraficaPeCalc",
+        "sala": "Sala L-308",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
                 "Mincu R",
                 "GraficaPeCalc",
                 "L-308"

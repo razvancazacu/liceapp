@@ -113,16 +113,16 @@
           "Gr.4"
         ]
       },
-        {
-            "zi": "Joi",
-            "ora_inceput": "8:00",
-            "ora_final": "10:00",
-            "profesor": "Cidota M",
-            "materie": "StatDataSci",
-            "sala": "Sala 202",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
+      {
+        "zi": "Joi",
+        "ora_inceput": "8:00",
+        "ora_final": "10:00",
+        "profesor": "Cidota M",
+        "materie": "StatDataSci",
+        "sala": "Sala 202",
+        "grupa": "none",
+        "saptamana": "Impar / Par",
+        "date": [
                 "Cidota M",
                 "StatDataSci",
                 "202"
@@ -161,15 +161,15 @@
             "ora_inceput": "8:00",
             "ora_final": "10:00",
             "profesor": "Alexe B",
-            "materie": "AdvMachLearn",
-            "sala": "Amf. Stoilow (Et. 1)",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Alexe B",
-                "AdvMachLearn",
-                "1(Stoilow)"
-            ]
+          "materie": "AdvMachLearn",
+          "sala": "Amf. Stoilow (Et. 1)",
+          "grupa": "none",
+          "saptamana": "Impar / Par",
+          "date": [
+            "Alexe B",
+            "AdvMachLearn",
+            "1(Stoilow)"
+          ]
         },
       {
         "zi": "Vineri",

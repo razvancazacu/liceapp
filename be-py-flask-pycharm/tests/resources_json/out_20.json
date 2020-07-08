@@ -77,19 +77,19 @@
             ]
         },
         {
-          "zi": "Miercuri",
-          "ora_inceput": "18:00",
-          "ora_final": "20:00",
-          "profesor": "Dumitriu A",
-          "materie": "IntroloT",
-          "sala": "Amf. Titeica (Et. 3)",
-          "grupa": "none",
-          "saptamana": "Par",
-          "date": [
-            "Dumitriu A",
-            "Intro loT",
-            "3(Titeica)"
-          ]
+            "zi": "Miercuri",
+            "ora_inceput": "18:00",
+            "ora_final": "20:00",
+            "profesor": "Dumitriu A",
+            "materie": "IntroloT",
+            "sala": "Amf. Titeica (Et. 3)",
+            "grupa": "none",
+            "saptamana": "Par",
+            "date": [
+                "Dumitriu A",
+                "Intro loT",
+                "3(Titeica)"
+            ]
         },
         {
             "zi": "Joi",
