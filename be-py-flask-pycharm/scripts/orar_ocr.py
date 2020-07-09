@@ -274,7 +274,7 @@ def extract_group(grupa, words):
     for idx, word in enumerate(words):
         idx_gr = word.lower().rfind('gr')
         idx_gr_2 = word.lower().rfind('g r')
-        if idx_gr != -1 and has_numbers(word[idx_gr:]):
+        if idx_gr != -1 and has_numbers(word[idx_gr:]) and (len(word) - idx_gr) < 5:
             grupa = words[idx][idx_gr:]
             words[idx] = words[idx][:idx_gr]
             break
@@ -336,17 +336,22 @@ def extract_classes_data(page_path):
 
             # Case when cell has on the same row the teacher name and the group
             idx_gr = filtered[0].lower().rfind('gr')
-            if idx_gr != -1 and has_numbers(filtered[idx_gr:]):
+            if idx_gr != -1 and has_numbers(filtered[0][idx_gr:]):
                 grupa = filtered[0][idx_gr:]
                 profesor = filtered[0][:idx_gr]
             else:
                 profesor = filtered[0]
-
+                idx_slash = profesor.find('/')
+                if idx_slash != -1 and len(profesor[idx_slash + 1:].split()) != 2 and len(filtered[1]) < 3:
+                    profesor = profesor + " " + filtered[1]
+                    filtered[0] = profesor
+                    filtered.pop(1)
             # Rare case of missreading 'Gr' as 'G r' or words splitted
             size_of_filtered = len(filtered)
             if size_of_filtered == 4:
                 filtered[1] += filtered[2]
                 filtered.pop(2)
+                size_of_filtered = len(filtered)
 
             # Extracted more words than anticipated.
             elif size_of_filtered > 4:
@@ -357,8 +362,8 @@ def extract_classes_data(page_path):
                         new_w += filtered[1]
                         filtered.pop(1)
                 filtered[1] = new_w + filtered[1]
+                size_of_filtered = len(filtered)
 
-            size_of_filtered = len(filtered)
             if size_of_filtered == 3:
                 materie = filtered[1]
                 partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
@@ -373,49 +378,55 @@ def extract_classes_data(page_path):
                     if any(word in partitioning[0] for word in {'Gr', 'G r'}):
                         grupa = ''.join(partitioning)
                         sala = 'none'
-                        warnings.append("No classroom found")
                     else:
                         sala = ''.join(partitioning)
             elif size_of_filtered == 2:
                 grupa = extract_group(grupa, filtered)
 
                 swap_prof_materie = False
-                if re.match(TEACHER_REGEX_NO_SPACE, filtered[0]):
-                    profesor = filtered[0]
-                    profesor = add_space_to_teacher(profesor)
+                if re.match(TEACHER_REGEX_NO_SPACE, filtered[0].replace('|', 'I')):
+                    profesor = add_space_to_teacher(filtered[0].replace('|', 'I'))
                     # print("space needed", filtered)
-                elif re.match(TEACHER_REGEX, filtered[0]) or ('indu' in filtered[0]):
-                    profesor = filtered[0]
+                elif re.match(TEACHER_REGEX, filtered[0]) or ('indu' in filtered[0].replace('|', 'I')) or (
+                        '/' in filtered[0]):
+                    profesor = filtered[0].replace('|', 'I')
                     # print("No change, no space", filtered)
                 else:
                     materie = filtered[0]
                     swap_prof_materie = True
                     # print("space not needed, change needed", filtered)
-
-                words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
-                # print('materie', materie, 'profesor', profesor)
-                # classroom and class are read
-                if len(words) > 1:
-                    # sala = words[-1]
-                    for idx, word in enumerate(words):
-                        if has_numbers(word):
-                            sala = word
-                            words.pop(idx)
-                    if swap_prof_materie:
-                        profesor = ''.join(words[:])
-                        profesor = add_space_to_teacher(profesor)
-                    else:
-                        materie = ''.join(words[:])
-                # classroom is not detected ( it is a single digit, so it needs psm-10 )
-                elif len(words) == 1:
-                    cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
-                    sala = get_cell_string(cell_img, "psm-10")
-                    if swap_prof_materie:
-                        profesor = words[0]
-                    else:
-                        materie = words[0]
+                if '[' in filtered[1] and ']' in filtered[1]:
+                    idx_d = filtered[1].find(']')
+                    materie = filtered[1][:idx_d + 1]
+                    sala = filtered[1][idx_d + 1:]
+                    print(materie, sala)
                 else:
-                    warnings.append("No received data")
+                    words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
+                    # print('materie', materie, 'profesor', profesor)
+                    # classroom and class are read
+                    if len(words) > 1:
+                        # sala = words[-1]
+                        for idx, word in enumerate(words):
+                            if has_numbers(word):
+                                sala = word
+                                words.pop(idx)
+                        aux_word = ''.join(words[:])
+                        if swap_prof_materie and (
+                                re.match(TEACHER_REGEX_NO_SPACE, aux_word) or re.match(TEACHER_REGEX, aux_word)):
+                            profesor = add_space_to_teacher(aux_word)
+                        else:
+                            materie = aux_word
+                    # classroom is not detected ( it is a single digit, so it needs psm-10 )
+                    elif len(words) == 1:
+                        cell_img = img_classes_col[y + int((2 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
+                        sala = get_cell_string(cell_img, "psm-10")
+                        if swap_prof_materie and (
+                                re.match(TEACHER_REGEX_NO_SPACE, words[0]) or re.match(TEACHER_REGEX, words[0])):
+                            profesor = words[0]
+                        else:
+                            materie = words[0]
+                    else:
+                        warnings.append("No received data")
 
             # Case of 1/3 or 1/4 cells that dont have a group.
             # Isolating cell part of group.
@@ -431,13 +442,11 @@ def extract_classes_data(page_path):
             grupa, grupa_processed, sala = classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y,
                                                                          warnings)
             # print(grupa, grupa_processed)
-
             temp = re.findall(r'\d+', profesor)
             res = list(map(int, temp))
-            if len(res) or profesor == '':
+            if profesor == '':
                 warnings.append("ERROR:No teacher found")
-                profesor += ' - none'
-
+                profesor += 'None'
             # calculate day
             current_day = int(y / (days[-1][1] - days[-2][1]))
             # Calculating if hour its weekly or once a odd/even week
@@ -445,13 +454,15 @@ def extract_classes_data(page_path):
             saptamana = get_week_type(day_cell_h, day_cell_y, grupa, h, y)
 
             grupa = grupa_processed
-            profesor = profesor.replace('|', 'I')
-            materie = materie.replace('|', 'l').replace(' ', '')
+            profesor = profesor.replace('|', 'I').replace('.', '').replace('-', '').replace('_', '')
+            materie = materie.replace('|', 'I').replace(' ', '')
             grupa = ''.join([i if ord(i) < 128 else '' for i in grupa])
             materie = ''.join([i if ord(i) < 128 else '' for i in materie])
             profesor = ''.join([i if ord(i) < 128 else '' for i in profesor])
             if 'gulici' in profesor:
                 profesor = "Dragulici D"
+            elif 'indust' in profesor:
+                profesor = "Industrie"
             ore.append(Ora(day_string[current_day], hour_string[current_hour_idx],
                            hour_string[current_hour_idx + round((w / 260))], profesor, materie, sala, saptamana,
                            grupa, extracted_data))
@@ -475,7 +486,7 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         # cell_img = img_classes_gray[y + int((1.8 * h) / 3):y + h, x + int((2.1 * w) / 3):x + w]
         # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
-    sala = sala.replace('|', '1')
+    sala = sala.replace('|', '1').replace('.', '-').replace(' ', '')
     if "Ha" in sala:
         sala = "Amf. Hater (Et. 0)"
     elif "St" in sala:
@@ -498,6 +509,8 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         sala = "Fac.Fizica -Magurele"
     elif not has_numbers(sala):
         sala = "Sala " + get_cell_string(cell_img, psm="psm-3")
+        if not has_numbers(sala) or sala == '':
+            warnings.append("WARN: No Classroom extracted")
     else:
         sala = "Sala " + sala
 
