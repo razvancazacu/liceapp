@@ -1,126 +1,126 @@
 {
-    "titlu": "CTl Grupa 354",
-    "warnings": [],
-    "ore": [
-        {
-            "zi": "Luni",
-            "ora_inceput": "16:00",
-            "ora_final": "18:00",
-            "profesor": "Diaconu Al",
-            "materie": "MetDezvSoft",
-            "sala": "Sala L-321",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Diaconu Al",
-                "MetDezvSoft",
-                "L-321"
-            ]
-        },
-        {
-            "zi": "Luni",
-            "ora_inceput": "12:00",
-            "ora_final": "14:00",
-            "profesor": "Diaconu Al",
-            "materie": "GraficaPeCalc",
-            "sala": "Sala 8",
-            "grupa": "none",
-            "saptamana": "Par",
-            "date": [
-                "Diaconu Al",
-                "GraficaPeCalc"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "12:00",
-            "ora_final": "14:00",
-            "profesor": "lon L",
-            "materie": "ArhitSistPar",
-            "sala": "Fac.Fizica -Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "lon L",
-                "ArhitSistPar",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "14:00",
-            "ora_final": "16:00",
-            "profesor": "Radu A",
-            "materie": "SistCuMicroproc",
-            "sala": "Fac.Fizica -Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Radu A",
-                "SistCuMicroproc",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "16:00",
-            "ora_final": "18:00",
-            "profesor": "354",
-            "materie": "SistCuMicroproc",
-            "sala": "Fac.Fizica -Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "354",
-                "SistCuMicroproc",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Marti",
-            "ora_inceput": "18:00",
-            "ora_final": "20:00",
-            "profesor": "354",
-            "materie": "ArhitSistPar",
-            "sala": "Fac.Fizica -Magurele",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "354",
-                "ArhitSistPar",
-                "Fac.Fizica -Magurele"
-            ]
-        },
-        {
-            "zi": "Miercuri",
-            "ora_inceput": "8:00",
-            "ora_final": "10:00",
-            "profesor": "Mincu R",
-            "materie": "GraficaPeCalc",
-            "sala": "Sala L-308",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Mincu R",
-                "GraficaPeCalc",
-                "L-308"
-            ]
-        },
-        {
-            "zi": "Joi",
-            "ora_inceput": "10:00",
-            "ora_final": "12:00",
-            "profesor": "Stupariu S",
-            "materie": "GraficaPeCalc",
-            "sala": "Amf. Stoilow (Et. 1)",
-            "grupa": "none",
-            "saptamana": "Impar / Par",
-            "date": [
-                "Stupariu S",
-                "GraficaPeCalc",
-                "1(Stoilow)"
-            ]
-        },
+  "titlu": "CTl Grupa 354",
+  "warnings": [],
+  "ore": [
+    {
+      "zi": "Luni",
+      "ora_inceput": "16:00",
+      "ora_final": "18:00",
+      "profesor": "Diaconu Al",
+      "materie": "MetDezvSoft",
+      "sala": "Sala L-321",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Diaconu Al",
+        "MetDezvSoft",
+        "L-321"
+      ]
+    },
+    {
+      "zi": "Luni",
+      "ora_inceput": "12:00",
+      "ora_final": "14:00",
+      "profesor": "Diaconu Al",
+      "materie": "GraficaPeCalc",
+      "sala": "Sala 8",
+      "grupa": "none",
+      "saptamana": "Par",
+      "date": [
+        "Diaconu Al",
+        "GraficaPeCalc"
+      ]
+    },
+    {
+      "zi": "Marti",
+      "ora_inceput": "12:00",
+      "ora_final": "14:00",
+      "profesor": "lon L",
+      "materie": "ArhitSistPar",
+      "sala": "Fac.Fizica -Magurele",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "lon L",
+        "ArhitSistPar",
+        "Fac.Fizica -Magurele"
+      ]
+    },
+    {
+      "zi": "Marti",
+      "ora_inceput": "14:00",
+      "ora_final": "16:00",
+      "profesor": "Radu A",
+      "materie": "SistCuMicroproc",
+      "sala": "Fac.Fizica -Magurele",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Radu A",
+        "SistCuMicroproc",
+        "Fac.Fizica -Magurele"
+      ]
+    },
+    {
+      "zi": "Marti",
+      "ora_inceput": "16:00",
+      "ora_final": "18:00",
+      "profesor": "354",
+      "materie": "SistCuMicroproc",
+      "sala": "Fac.Fizica -Magurele",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "354",
+        "SistCuMicroproc",
+        "Fac.Fizica -Magurele"
+      ]
+    },
+    {
+      "zi": "Marti",
+      "ora_inceput": "18:00",
+      "ora_final": "20:00",
+      "profesor": "354",
+      "materie": "ArhitSistPar",
+      "sala": "Fac.Fizica -Magurele",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "354",
+        "ArhitSistPar",
+        "Fac.Fizica -Magurele"
+      ]
+    },
+    {
+      "zi": "Miercuri",
+      "ora_inceput": "8:00",
+      "ora_final": "10:00",
+      "profesor": "Mincu R",
+      "materie": "GraficaPeCalc",
+      "sala": "Sala L-308",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Mincu R",
+        "GraficaPeCalc",
+        "L-308"
+      ]
+    },
+    {
+      "zi": "Joi",
+      "ora_inceput": "10:00",
+      "ora_final": "12:00",
+      "profesor": "Stupariu S",
+      "materie": "GraficaPeCalc",
+      "sala": "Amf. Stoilow (Et. 1)",
+      "grupa": "none",
+      "saptamana": "Impar / Par",
+      "date": [
+        "Stupariu S",
+        "GraficaPeCalc",
+        "1(Stoilow)"
+      ]
+    },
         {
             "zi": "Vineri",
             "ora_inceput": "12:00",

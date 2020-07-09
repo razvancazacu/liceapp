@@ -399,7 +399,7 @@ def extract_classes_data(page_path):
                     idx_d = filtered[1].find(']')
                     materie = filtered[1][:idx_d + 1]
                     sala = filtered[1][idx_d + 1:]
-                    print(materie, sala)
+                    # print(materie, sala)
                 else:
                     words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
                     # print('materie', materie, 'profesor', profesor)
