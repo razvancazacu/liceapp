@@ -1,3 +1,4 @@
+import datetime
 import json
 import multiprocessing
 import os
@@ -147,6 +148,7 @@ def load_images_from_folder(path):
         boxes_hours = get_table_cells(img_hours, 'hours')
 
         img_classes = get_cropped_classes_img(img)
+        # print_img(img_classes)
         img_classes_col = get_cropped_classes_img(img_color)
         boxes_classes, gray_classes, bit_classes = get_table_cells(img_classes, 'classes')
 
@@ -243,19 +245,20 @@ def get_small_cell_values(grupa, img_classes_col, x, y, w, h):
 
     # The second argument is the teacher name
     # Swapping needed for further processing
-    filtered_left_part = [word for word in left_part[1].split() if (len(word) >= 1) and (word != ' ')]
+    if len(left_part) >= 2:
+        filtered_left_part = [word for word in left_part[1].split() if (len(word) >= 1) and (word != ' ')]
     # print(filtered_left_part)
 
-    if len(filtered_left_part) >= 2 and re.match(TEACHER_REGEX,
-                                                 filtered_left_part[0] + filtered_left_part[1]) or (
-            'indu' in left_part[1]):
-        left_part[0], left_part[1] = left_part[1], left_part[0]
+        if len(filtered_left_part) >= 2 and re.match(TEACHER_REGEX,
+                                                     filtered_left_part[0] + filtered_left_part[1]) or (
+                'indu' in left_part[1]):
+            left_part[0], left_part[1] = left_part[1], left_part[0]
 
-    elif (len(filtered_left_part) == 1 and re.match(TEACHER_REGEX_NO_SPACE, filtered_left_part[0])) or (
-            'indu' in filtered_left_part[0]):
-        left_part[1] = add_space_to_teacher(left_part[1])
-        left_part[0], left_part[1] = left_part[1], left_part[0]
-    # print(left_part)
+        elif (len(filtered_left_part) == 1 and re.match(TEACHER_REGEX_NO_SPACE, filtered_left_part[0])) or (
+                'indu' in filtered_left_part[0]):
+            left_part[1] = add_space_to_teacher(left_part[1])
+            left_part[0], left_part[1] = left_part[1], left_part[0]
+        # print(left_part)
 
     grupa = extract_group(grupa, right_part)
     if grupa == "none":
@@ -349,8 +352,17 @@ def extract_classes_data(page_path):
             # Rare case of missreading 'Gr' as 'G r' or words splitted
             size_of_filtered = len(filtered)
             if size_of_filtered == 4:
-                filtered[1] += filtered[2]
-                filtered.pop(2)
+                filtered[1] = filtered[1].replace('_', '').replace('|', 'I')
+                if re.match(TEACHER_REGEX, filtered[1]) or re.match(TEACHER_REGEX_NO_SPACE, filtered[1]):
+                    if '/' in filtered[0]:
+                        filtered[0] += ' ' + filtered[1]
+                    else:
+                        filtered[0] += ' / ' + filtered[1]
+                    filtered.pop(1)
+                    profesor = filtered[0]
+                else:
+                    filtered[1] += filtered[2]
+                    filtered.pop(2)
                 size_of_filtered = len(filtered)
 
             # Extracted more words than anticipated.
@@ -367,14 +379,15 @@ def extract_classes_data(page_path):
             if size_of_filtered == 3:
                 materie = filtered[1]
                 partitioning = [word for word in filtered[2].split() if (len(word) >= 1) and (word != ' ')]
-                if len(partitioning) >= 3:
+                len_part = len(partitioning)
+                if len_part >= 3:
                     if any(word in partitioning[0] for word in {'G', 'SE', 'CU', 'se'}):
                         grupa = ''.join(partitioning[:-1])
                         sala = partitioning[-1]
-                elif len(partitioning) == 2 and ('G' in partitioning[0]):
+                elif len_part == 2 and ('G' in partitioning[0]):
                     grupa = partitioning[0]
                     sala = partitioning[1]
-                else:
+                elif len_part == 1:
                     if any(word in partitioning[0] for word in {'Gr', 'G r'}):
                         grupa = ''.join(partitioning)
                         sala = 'none'
@@ -382,13 +395,13 @@ def extract_classes_data(page_path):
                         sala = ''.join(partitioning)
             elif size_of_filtered == 2:
                 grupa = extract_group(grupa, filtered)
-
                 swap_prof_materie = False
-                if re.match(TEACHER_REGEX_NO_SPACE, filtered[0].replace('|', 'I')):
+                if re.match(TEACHER_REGEX_NO_SPACE, filtered[0].replace('|', 'I')) and filtered[0].replace(' ',
+                                                                                                           ''):
                     profesor = add_space_to_teacher(filtered[0].replace('|', 'I'))
                     # print("space needed", filtered)
                 elif re.match(TEACHER_REGEX, filtered[0]) or ('indu' in filtered[0].replace('|', 'I')) or (
-                        '/' in filtered[0]):
+                        '/' in filtered[0]) and filtered[0].replace(' ', ''):
                     profesor = filtered[0].replace('|', 'I')
                     # print("No change, no space", filtered)
                 else:
@@ -400,6 +413,12 @@ def extract_classes_data(page_path):
                     materie = filtered[1][:idx_d + 1]
                     sala = filtered[1][idx_d + 1:]
                     # print(materie, sala)
+
+                # Case of class at Magurele and no teacher is assigned
+                elif 'Magurele' in filtered[1] and 'lab' in filtered[1]:
+                    sala = filtered[1]
+                    if profesor == materie:
+                        profesor = 'none'
                 else:
                     words = [word for word in filtered[1].split() if (len(word) >= 1) and (word != ' ')]
                     # print('materie', materie, 'profesor', profesor)
@@ -410,9 +429,10 @@ def extract_classes_data(page_path):
                             if has_numbers(word):
                                 sala = word
                                 words.pop(idx)
-                        aux_word = ''.join(words[:])
+                        aux_word = ''.join(words[:]).replace('|', 'I')
                         if swap_prof_materie and (
-                                re.match(TEACHER_REGEX_NO_SPACE, aux_word) or re.match(TEACHER_REGEX, aux_word)):
+                                re.match(TEACHER_REGEX_NO_SPACE, aux_word) or re.match(TEACHER_REGEX, aux_word) or (
+                                'BanuDem' in aux_word)):
                             profesor = add_space_to_teacher(aux_word)
                         else:
                             materie = aux_word
@@ -446,7 +466,10 @@ def extract_classes_data(page_path):
             res = list(map(int, temp))
             if profesor == '':
                 warnings.append("ERROR:No teacher found")
-                profesor += 'None'
+                profesor = 'None'
+            elif 'Fizica' in profesor.replace(' ', '') and materie == '':
+                materie = profesor
+                profesor = 'None'
             # calculate day
             current_day = int(y / (days[-1][1] - days[-2][1]))
             # Calculating if hour its weekly or once a odd/even week
@@ -487,16 +510,18 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         # print_img(cell_img)
         sala = get_cell_string(cell_img, psm="psm-10")
     sala = sala.replace('|', '1').replace('.', '-').replace(' ', '')
-    if "Ha" in sala:
-        sala = "Amf. Hater (Et. 0)"
-    elif "St" in sala:
+    if any(x in sala for x in ['Ha', 'ret']):
+        sala = "Amf. Haret (Et. 0)"
+    elif any(x in sala for x in ['St', 'low']):
         sala = "Amf. Stoilow (Et. 1)"
-    elif "Po" in sala:
+    elif any(x in sala for x in ['Po', 'peiu']):
         sala = "Amf. Pompeiu (Et. 2)"
-    elif "Ti" in sala:
+    elif any(x in sala for x in ['Ti', 'eica']):
         sala = "Amf. Titeica (Et. 3)"
-    elif "Chim" in sala or 'him' in sala:
+    elif any(x in sala for x in ['Chim', 'imie']):
         sala = "Amf. R1 (Et. 1, Fac. Chimie)"
+    elif any(x in sala for x in ['goo', 'gle']):
+        sala = "214 Google"
     elif sala == 'O':
         sala = "Sala " + '9'
     elif sala == 'Z' or sala == 'S':
@@ -505,16 +530,20 @@ def classroom_group_preprocessing(grupa, h, img_classes_gray, sala, w, x, y, war
         sala = "Sala " + '12'
     elif any(x in sala for x in ['zie', 'Zag', 'Ze']):
         sala = "Sala " + '219'
-    elif any(x in sala for x in ['Mag', 'Fiz', 'ica']):
-        sala = "Fac.Fizica -Magurele"
+    elif any(x in sala for x in ['Mag', 'Fiz', 'ica','urele', 'lab']):
+        if 'lab' in sala:
+            sala = 'laborator Magurele'
+        else:
+            sala = "Fac.Fizica -Magurele"
     elif not has_numbers(sala):
         sala = "Sala " + get_cell_string(cell_img, psm="psm-3")
-        if not has_numbers(sala) or sala == '':
-            warnings.append("WARN: No Classroom extracted")
+        # if not has_numbers(sala) or sala == '':
+            # Commented because there is a pandemic atm
+            # warnings.append("WARN: No Classroom extracted")
     else:
         sala = "Sala " + sala
 
-    temp = re.findall(r'\d+', grupa)
+    temp = re.findall(r'\d+', grupa)1
     res = list(map(int, temp))
 
     if len(res):
@@ -563,7 +592,8 @@ def get_pages(img_folder_path):
 
 def write_pages_to_json_file(img_folder_path):
     pages = extract_pages_data(img_folder_path)
-    with open('extracted/Pages_to_JSON.json', 'w') as outfile:
+    dt_string = datetime.datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
+    with open('extracted/JSON/page_to_json' + dt_string + '.json', 'w') as outfile:
         outfile.write(json.dumps(pages, default=Pagina.to_json))
         # json.loads
 
@@ -575,7 +605,7 @@ def extract_pages_data(img_folder_path):
     for filename in os.listdir(folder):
         paths.append(os.path.join(folder, filename))
     num_cores = multiprocessing.cpu_count()
-    pages = Parallel(n_jobs=num_cores, backend='multiprocessing')(
+    pages = Parallel(n_jobs=4, backend='multiprocessing')(
         delayed(extract_classes_data)(path) for path in paths)
     print(time.time() - start)
     return pages

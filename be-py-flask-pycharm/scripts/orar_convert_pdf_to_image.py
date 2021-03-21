@@ -22,5 +22,6 @@ def convert_pdf_to_images(pdf_name):
                       thread_count=4,
                       dpi=300,
                       output_folder='resources/Images',
-                      fmt="jpeg")
+                      fmt="jpeg",
+                      poppler_path="C:/Program Files/poppler-20.09.0/bin")
     print("Ended PDF to JPEG Conversion")

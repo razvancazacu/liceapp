@@ -74,3 +74,7 @@ def mysql_connection(pages):
 
 def extract_pages(path):
     mysql_connection(orar_ocr.get_pages(path))
+
+
+def load_db_from_json(pages):
+    mysql_connection(pages)

@@ -1,13 +1,16 @@
+import json
 import threading
 import time
+import filecmp
 from multiprocessing import Process
-from os import listdir, getcwd
+from os import listdir, getcwd, rename
 from os.path import isfile, join, abspath
 
 import flask_server
-from scripts.db_controller import extract_pages
+from scripts.db_controller import extract_pages, load_db_from_json
 from scripts.orar_convert_pdf_to_image import convert_pdf_to_images
 from scripts.orar_download import get_fmi_pdf
+from scripts.orar_ocr import Pagina
 
 
 class MainControl:
@@ -51,6 +54,7 @@ class MainControl:
 
     def start_server(self):
         if not self.server_process.is_alive():
+            self.server_process = Process(target=flask_server.main, args=(self.host, self.port))
             self.server_process.start()
             self.server_status = "Online"
         else:
@@ -81,17 +85,34 @@ class MainControl:
             extract_pages(path)
         print("Ended Data Extraction")
 
+    def isDuplicate(self):
+        pdfs = self.get_local_pdfs()
+        old_pdf = "old" + self.current_pdf[3:]
+        if old_pdf in pdfs:
+            if filecmp.cmp('resources/' + old_pdf, 'resources/' + self.current_pdf):
+                return True
+        return False
+
     def auto_start(self):
         print("Started server, download, convert and data extraction")
         self.start_server()
         self.download_pdf()
-        self.convert_pdf_to_img()
-        self.extract_data()
+        if self.isDuplicate():
+            print("Schedule is the same as the last processed")
+        else:
+            self.convert_pdf_to_img()
+            self.extract_data()
+            rename('resources/' + self.current_pdf, 'resources/old' + self.current_pdf[3:])
 
     def auto_extract_on_timer(self):
+        self.pdf_option = 'latest'
         self.download_pdf()
-        self.convert_pdf_to_img()
-        self.extract_data()
+        if self.isDuplicate():
+            print("Schedule is the same as the last processed")
+        else:
+            self.convert_pdf_to_img()
+            self.extract_data()
+            rename('resources/' + self.current_pdf, 'resources/old' + self.current_pdf[3:])
 
     def auto_extract_on_timer_sleeper(self):
         if not self.thread_time_sleep.is_alive():

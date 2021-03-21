@@ -51,8 +51,8 @@ class OreModel(db.Model):
 
 class OreView(ModelView):
     page_size = 50
-    column_searchable_list = ('sala', 'materie', 'orar.nume_orar', 'profesor')
-    column_filters = ('sala', 'materie', 'orar.nume_orar', 'profesor')
+    column_searchable_list = ('sala', 'materie', 'orar.nume_orar', 'profesor','saptamana')
+    column_filters = ('sala', 'materie', 'orar.nume_orar', 'profesor','saptamana')
 
 
 class WarningsModel(db.Model):

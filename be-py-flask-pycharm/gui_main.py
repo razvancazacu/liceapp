@@ -5,7 +5,7 @@ import gui_controller
 if __name__ == '__main__':
     root = Tk()
     root.title("Control")
-    root.geometry("440x450")
+    root.geometry("440x500")
     Controller = gui_controller.MainControl()
 
     selected_local_pdf = StringVar(root)
